@@ -179,3 +179,12 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+# Project: secrets and local files
+.env.*
+!.env.example
+deploy/k8s/secret.yaml
+node_modules/
+.next/
+frontend/out/
+*.local
+.model_cache/

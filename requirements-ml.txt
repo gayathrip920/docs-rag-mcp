@@ -1,0 +1,2 @@
+# Local models, kept apart so tests and CI do not need to download torch.
+sentence-transformers>=3.0

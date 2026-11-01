@@ -17,6 +17,18 @@ The web app never uses a key stored on the server. You type your own OpenRouter 
 
 The search runs over a pinned snapshot of the FastAPI docs. See [data/SOURCE.md](data/SOURCE.md) for the exact commit and credit.
 
+## Loading the docs into the database
+
+```bash
+pip install -r requirements.txt -r requirements-ml.txt
+cp .env.example .env     # then put your own DATABASE_URL in .env
+python -m rag.ingest
+```
+
+The database is Postgres with the pgvector extension, for example a free Neon project. Each page is cut into chunks that keep the page title and heading. Running the command again is safe: unchanged pages are skipped.
+
+To see how the docs get chunked without a database or model, run `python -m rag.ingest --dry-run`.
+
 ## Test questions
 
 `evals/questions.jsonl` has 60 questions, each with the doc page that answers it. `evals/out_of_scope.jsonl` has 10 questions the docs cannot answer, used to check that the app says "not found". Run `python evals/check_questions.py` to confirm every listed page exists.

@@ -1,0 +1,10 @@
+{"id": "o01", "question": "What is the capital of France?"}
+{"id": "o02", "question": "How do I write Django ORM migrations?"}
+{"id": "o03", "question": "How do I train a neural network with PyTorch?"}
+{"id": "o04", "question": "How do I set up an Ingress controller in Kubernetes?"}
+{"id": "o05", "question": "What is the best recipe for chocolate chip cookies?"}
+{"id": "o06", "question": "How do I use getServerSideProps in Next.js?"}
+{"id": "o07", "question": "How do I configure a Redis cluster with sharding?"}
+{"id": "o08", "question": "How do I build a REST API in Rust with Axum?"}
+{"id": "o09", "question": "What is the weather like in Tokyo today?"}
+{"id": "o10", "question": "How do I define blueprints and templates in Laravel?"}

@@ -1,0 +1,60 @@
+{"id": "q01", "question": "How do I create my first app and start the development server?", "gold_pages": ["tutorial/first-steps.md"]}
+{"id": "q02", "question": "How do I declare a variable in the URL path and have its type checked?", "gold_pages": ["tutorial/path-params.md"]}
+{"id": "q03", "question": "How can a path parameter hold a whole file path like /files/home/me/a.txt?", "gold_pages": ["tutorial/path-params.md"]}
+{"id": "q04", "question": "How do I restrict a path parameter to a fixed set of allowed values?", "gold_pages": ["tutorial/path-params.md"]}
+{"id": "q05", "question": "How do I declare optional query parameters with default values?", "gold_pages": ["tutorial/query-params.md"]}
+{"id": "q06", "question": "How do I make a query string parameter have a maximum length?", "gold_pages": ["tutorial/query-params-str-validations.md"]}
+{"id": "q07", "question": "How do I require a path parameter to be greater than or equal to 1?", "gold_pages": ["tutorial/path-params-numeric-validations.md"]}
+{"id": "q08", "question": "How do I read a JSON request body into a typed model?", "gold_pages": ["tutorial/body.md"]}
+{"id": "q09", "question": "How do I combine path, query and body parameters in one function?", "gold_pages": ["tutorial/body-multiple-params.md"]}
+{"id": "q10", "question": "How do I add validation and metadata to the fields inside a Pydantic model?", "gold_pages": ["tutorial/body-fields.md"]}
+{"id": "q11", "question": "How do I accept a list of sub-models inside a request body?", "gold_pages": ["tutorial/body-nested-models.md"]}
+{"id": "q12", "question": "How do I put example data into the generated API docs for a model?", "gold_pages": ["tutorial/schema-extra-example.md"]}
+{"id": "q13", "question": "Which special data types like UUID and datetime can I use in parameters?", "gold_pages": ["tutorial/extra-data-types.md"]}
+{"id": "q14", "question": "How do I read cookies sent by the client?", "gold_pages": ["tutorial/cookie-params.md"]}
+{"id": "q15", "question": "How do I read request headers, and what happens to underscores in the name?", "gold_pages": ["tutorial/header-params.md"]}
+{"id": "q16", "question": "How do I stop a password field from being returned in the response?", "gold_pages": ["tutorial/response-model.md"]}
+{"id": "q17", "question": "How can I avoid repeating similar models for user input and output?", "gold_pages": ["tutorial/extra-models.md"]}
+{"id": "q18", "question": "How do I make an endpoint answer with status code 201?", "gold_pages": ["tutorial/response-status-code.md"]}
+{"id": "q19", "question": "How do I receive form fields instead of JSON?", "gold_pages": ["tutorial/request-forms.md"]}
+{"id": "q20", "question": "How do I let users upload a file?", "gold_pages": ["tutorial/request-files.md"]}
+{"id": "q21", "question": "How do I accept both uploaded files and form fields in one request?", "gold_pages": ["tutorial/request-forms-and-files.md"]}
+{"id": "q22", "question": "How do I return an error with a custom message to the client?", "gold_pages": ["tutorial/handling-errors.md"]}
+{"id": "q23", "question": "How do I add tags, a summary and a description to an endpoint?", "gold_pages": ["tutorial/path-operation-configuration.md"]}
+{"id": "q24", "question": "How do I set the title, description and version shown in the API docs?", "gold_pages": ["tutorial/metadata.md"]}
+{"id": "q25", "question": "How do I update only some fields of a stored item?", "gold_pages": ["tutorial/body-updates.md"]}
+{"id": "q26", "question": "How do I turn a model into JSON-compatible data before saving it to a database?", "gold_pages": ["tutorial/encoder.md"]}
+{"id": "q27", "question": "How do I share common logic between several endpoints?", "gold_pages": ["tutorial/dependencies/index.md"]}
+{"id": "q28", "question": "Can I use a class instead of a function as a dependency?", "gold_pages": ["tutorial/dependencies/classes-as-dependencies.md"]}
+{"id": "q29", "question": "How do I close a database session after the response is sent?", "gold_pages": ["tutorial/dependencies/dependencies-with-yield.md"]}
+{"id": "q30", "question": "How do I apply one dependency to every route in my app?", "gold_pages": ["tutorial/dependencies/global-dependencies.md"]}
+{"id": "q31", "question": "How do I make a dependency that itself needs another dependency?", "gold_pages": ["tutorial/dependencies/sub-dependencies.md"]}
+{"id": "q32", "question": "How do I add a dependency when I do not need its return value?", "gold_pages": ["tutorial/dependencies/dependencies-in-path-operation-decorators.md"]}
+{"id": "q33", "question": "How do I let a browser frontend on another domain call my API?", "gold_pages": ["tutorial/cors.md"]}
+{"id": "q34", "question": "How do I send an email after returning the response without making the client wait?", "gold_pages": ["tutorial/background-tasks.md"]}
+{"id": "q35", "question": "How do I serve images and CSS files from a folder?", "gold_pages": ["tutorial/static-files.md"]}
+{"id": "q36", "question": "How do I add a header to every response with a middleware?", "gold_pages": ["tutorial/middleware.md"]}
+{"id": "q37", "question": "How do I split a large app across several files?", "gold_pages": ["tutorial/bigger-applications.md"]}
+{"id": "q38", "question": "How do I write automated tests for my endpoints?", "gold_pages": ["tutorial/testing.md"]}
+{"id": "q39", "question": "How do I connect my app to a SQL database?", "gold_pages": ["tutorial/sql-databases.md"]}
+{"id": "q40", "question": "How do I set up a basic login flow with a token?", "gold_pages": ["tutorial/security/first-steps.md"]}
+{"id": "q41", "question": "How do I hash passwords and create JWT access tokens?", "gold_pages": ["tutorial/security/oauth2-jwt.md"]}
+{"id": "q42", "question": "How do I find out which user is making the request from their token?", "gold_pages": ["tutorial/security/get-current-user.md"]}
+{"id": "q43", "question": "How do I run my app from a Python file so I can attach a debugger?", "gold_pages": ["tutorial/debugging.md"]}
+{"id": "q44", "question": "How do I stream Server-Sent Events to the browser?", "gold_pages": ["tutorial/server-sent-events.md"]}
+{"id": "q45", "question": "How do I stream a sequence of JSON objects one per line?", "gold_pages": ["tutorial/stream-json-lines.md"]}
+{"id": "q46", "question": "How do I package my app in a Docker image?", "gold_pages": ["deployment/docker.md"]}
+{"id": "q47", "question": "How do I run several worker processes of my server?", "gold_pages": ["deployment/server-workers.md"]}
+{"id": "q48", "question": "How do I deploy my app to FastAPI Cloud?", "gold_pages": ["deployment/fastapicloud.md"]}
+{"id": "q49", "question": "What is HTTPS and how does it work for my deployed app?", "gold_pages": ["deployment/https.md"]}
+{"id": "q50", "question": "How should I pin the version of the framework in my requirements?", "gold_pages": ["deployment/versions.md"]}
+{"id": "q51", "question": "How do I run my app behind a proxy that adds a path prefix?", "gold_pages": ["advanced/behind-a-proxy.md"]}
+{"id": "q52", "question": "How do I read app settings from environment variables?", "gold_pages": ["advanced/settings.md"]}
+{"id": "q53", "question": "How do I run code when the app starts and when it shuts down?", "gold_pages": ["advanced/events.md"]}
+{"id": "q54", "question": "How do I add a WebSocket endpoint?", "gold_pages": ["advanced/websockets.md"]}
+{"id": "q55", "question": "How do I return HTML or plain text instead of JSON?", "gold_pages": ["advanced/custom-response.md"]}
+{"id": "q56", "question": "How do I return a response directly and skip the usual JSON conversion?", "gold_pages": ["advanced/response-directly.md"]}
+{"id": "q57", "question": "How do I document extra possible responses in the OpenAPI schema?", "gold_pages": ["advanced/additional-responses.md"]}
+{"id": "q58", "question": "How do I generate client SDK code for my API?", "gold_pages": ["advanced/generate-clients.md"]}
+{"id": "q59", "question": "How do I hide the interactive docs in production?", "gold_pages": ["how-to/conditional-openapi.md"]}
+{"id": "q60", "question": "When should I use async def and when a normal def?", "gold_pages": ["async.md"]}

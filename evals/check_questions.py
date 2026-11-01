@@ -4,6 +4,7 @@ Run from the repo root:  python evals/check_questions.py
 It makes sure every question has an id, no ids repeat, and every gold page
 really exists in data/raw.
 """
+
 import json
 import sys
 from pathlib import Path
@@ -14,8 +15,8 @@ RAW = ROOT / "data" / "raw"
 
 def load(name):
     path = ROOT / "evals" / name
-    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
-    return rows
+    lines = path.read_text(encoding="utf-8").splitlines()
+    return [json.loads(line) for line in lines if line.strip()]
 
 
 def main():

@@ -1,5 +1,7 @@
 # docs-rag-mcp
 
+[![CI](https://github.com/gayathrip920/docs-rag-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/gayathrip920/docs-rag-mcp/actions/workflows/ci.yml)
+
 Ask questions about a public documentation set and get short answers with links back to the source pages.
 
 You can use it two ways:

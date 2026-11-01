@@ -5,6 +5,8 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# The docs snapshot is someone else's text, not our code.
+extend-exclude = ["data"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B"]

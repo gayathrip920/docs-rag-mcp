@@ -53,6 +53,17 @@ Things to keep in mind:
 - Re-ranking found the correct page for 59 of 60 questions. The one miss is "How do I create my first app and start the development server?", where other pages ranked above the first steps page.
 - Full per-question misses are in `evals/results/retrieval.json`. To repeat the run: `python -m evals.run_retrieval_eval`.
 
+## How answers work
+
+1. The question goes through the best search method (hybrid plus re-ranking) and the top 5 chunks are picked.
+2. The chunks are shown to the model as numbered sources, with rules: use only the sources, cite them like [1], and reply "Not found in the docs." if the answer is not there.
+3. The reply is checked. Citation numbers that do not match a real source are removed and flagged. If nothing is retrieved at all, the model is not called.
+4. The time, cost and whether an answer was found are saved in the `queries` table. The question text is saved too, but the API key never is.
+
+The code is in `rag/answer.py` and `rag/llm.py`. The model is reached through OpenRouter, and the key is passed in with each request. It is not read from the server for the web app.
+
+The answer logic is covered by tests that use a fake model. It has not yet been tried against the real OpenRouter service, so no answer quality numbers exist yet.
+
 ## Test questions
 
 `evals/questions.jsonl` has 60 questions, each with the doc page that answers it. `evals/out_of_scope.jsonl` has 10 questions the docs cannot answer, used to check that the app says "not found". Run `python evals/check_questions.py` to confirm every listed page exists.

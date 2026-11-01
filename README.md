@@ -31,6 +31,28 @@ The database is Postgres with the pgvector extension, for example a free Neon pr
 
 To see how the docs get chunked without a database or model, run `python -m rag.ingest --dry-run`.
 
+## Search results
+
+Measured on 2026-11-01 with 60 questions (see `evals/questions.jsonl`). Each question has one correct doc page. The search returns chunks, which are turned into a list of pages.
+
+| Method | recall@5 | MRR@10 | Search time (median / p95) |
+|---|---|---|---|
+| Vector only | 0.950 | 0.821 | 44 ms / 115 ms |
+| Hybrid (vector + keyword) | 0.950 | 0.801 | 140 ms / 214 ms |
+| Hybrid + rerank | 0.983 | 0.828 | 3.0 s / 3.6 s |
+
+- recall@5: the share of correct pages found in the top 5 pages.
+- MRR@10: the average of 1 divided by the position of the correct page (0 if it is not in the top 10).
+- Models: `all-MiniLM-L6-v2` for embeddings and `ms-marco-MiniLM-L-6-v2` for re-ranking. Chunks are up to 300 words with 40 words of overlap.
+- Times are for the search step only, on a CPU inside a container. The re-ranker is the slow part.
+
+Things to keep in mind:
+
+- With 60 questions, one question is worth 1.7 points of recall, so small gaps are not strong evidence.
+- Adding keyword search did not help here. It matched vector search on recall@5 and was slightly lower on MRR.
+- Re-ranking found the correct page for 59 of 60 questions. The one miss is "How do I create my first app and start the development server?", where other pages ranked above the first steps page.
+- Full per-question misses are in `evals/results/retrieval.json`. To repeat the run: `python -m evals.run_retrieval_eval`.
+
 ## Test questions
 
 `evals/questions.jsonl` has 60 questions, each with the doc page that answers it. `evals/out_of_scope.jsonl` has 10 questions the docs cannot answer, used to check that the app says "not found". Run `python evals/check_questions.py` to confirm every listed page exists.

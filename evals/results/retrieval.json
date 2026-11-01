@@ -1,0 +1,134 @@
+{
+  "date": "2026-11-01",
+  "questions": 60,
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "rerank_model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+  "chunk_max_words": 300,
+  "chunk_overlap_words": 40,
+  "candidates_per_search": 30,
+  "note": "recall@5 is the share of correct pages found in the top 5 pages. mrr@10 is the mean of 1/position of the first correct page.",
+  "results": {
+    "vector": {
+      "recall@5": 0.95,
+      "mrr@10": 0.8213,
+      "retrieval_ms_p50": 44.2,
+      "retrieval_ms_p95": 114.9,
+      "missed_questions": [
+        {
+          "id": "q01",
+          "question": "How do I create my first app and start the development server?",
+          "gold_pages": [
+            "tutorial/first-steps.md"
+          ],
+          "top_pages": [
+            "deployment/manually.md",
+            "deployment/fastapicloud.md",
+            "tutorial/sql-databases.md",
+            "deployment/concepts.md",
+            "deployment/index.md"
+          ]
+        },
+        {
+          "id": "q23",
+          "question": "How do I add tags, a summary and a description to an endpoint?",
+          "gold_pages": [
+            "tutorial/path-operation-configuration.md"
+          ],
+          "top_pages": [
+            "tutorial/metadata.md",
+            "how-to/general.md",
+            "tutorial/query-params-str-validations.md",
+            "advanced/custom-response.md",
+            "advanced/additional-responses.md"
+          ]
+        },
+        {
+          "id": "q27",
+          "question": "How do I share common logic between several endpoints?",
+          "gold_pages": [
+            "tutorial/dependencies/index.md"
+          ],
+          "top_pages": [
+            "tutorial/bigger-applications.md",
+            "tutorial/middleware.md",
+            "how-to/custom-request-and-route.md",
+            "tutorial/security/get-current-user.md",
+            "advanced/additional-responses.md"
+          ]
+        }
+      ]
+    },
+    "hybrid": {
+      "recall@5": 0.95,
+      "mrr@10": 0.801,
+      "retrieval_ms_p50": 139.5,
+      "retrieval_ms_p95": 214.3,
+      "missed_questions": [
+        {
+          "id": "q01",
+          "question": "How do I create my first app and start the development server?",
+          "gold_pages": [
+            "tutorial/first-steps.md"
+          ],
+          "top_pages": [
+            "tutorial/sql-databases.md",
+            "fastapi-cli.md",
+            "tutorial/frontend.md",
+            "index.md",
+            "deployment/https.md"
+          ]
+        },
+        {
+          "id": "q10",
+          "question": "How do I add validation and metadata to the fields inside a Pydantic model?",
+          "gold_pages": [
+            "tutorial/body-fields.md"
+          ],
+          "top_pages": [
+            "tutorial/schema-extra-example.md",
+            "advanced/settings.md",
+            "advanced/dataclasses.md",
+            "how-to/migrate-from-pydantic-v1-to-pydantic-v2.md",
+            "tutorial/query-params-str-validations.md"
+          ]
+        },
+        {
+          "id": "q35",
+          "question": "How do I serve images and CSS files from a folder?",
+          "gold_pages": [
+            "tutorial/static-files.md"
+          ],
+          "top_pages": [
+            "how-to/custom-docs-ui-assets.md",
+            "advanced/templates.md",
+            "advanced/custom-response.md",
+            "tutorial/request-files.md",
+            "deployment/docker.md"
+          ]
+        }
+      ]
+    },
+    "hybrid_rerank": {
+      "recall@5": 0.9833,
+      "mrr@10": 0.8283,
+      "retrieval_ms_p50": 3006.8,
+      "retrieval_ms_p95": 3616.1,
+      "missed_questions": [
+        {
+          "id": "q01",
+          "question": "How do I create my first app and start the development server?",
+          "gold_pages": [
+            "tutorial/first-steps.md"
+          ],
+          "top_pages": [
+            "tutorial/sql-databases.md",
+            "fastapi-cli.md",
+            "deployment/concepts.md",
+            "tutorial/frontend.md",
+            "deployment/manually.md"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -100,6 +100,48 @@ API_URL=http://localhost:8000 npm run dev    # then open http://localhost:3000
 
 `API_URL` is read when the app is built, so set it before `npm run build`.
 
+## Use it as an MCP server
+
+The MCP server lets any MCP-compatible tool search these docs. It runs on your own computer and talks to the search API, so you need the API running first (or a hosted one, set with `DOCS_API_URL`).
+
+```bash
+pip install -r requirements-mcp.txt
+python -m mcp_server.server        # speaks MCP over stdio
+```
+
+Add it to your MCP client's settings. The exact file differs by client, but the entry looks like this:
+
+```json
+{
+  "mcpServers": {
+    "docs-rag": {
+      "command": "python",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": "/path/to/docs-rag-mcp",
+      "env": {
+        "DOCS_API_URL": "http://localhost:8000",
+        "OPENROUTER_API_KEY": "optional, only for ask_docs"
+      }
+    }
+  }
+}
+```
+
+| Tool | What it does | Needs a key? |
+|---|---|---|
+| `search_docs(query, k)` | Best matching doc sections with links. `k` is 1 to 20. | No |
+| `get_page(path)` | Full text of one page, for example `tutorial/cors.md`. Long pages are cut at 20,000 characters. | No |
+| `ask_docs(question)` | Short answer with numbered citations, or "Not found in the docs." | Yes, your own `OPENROUTER_API_KEY` |
+
+`ask_docs` is only offered when `OPENROUTER_API_KEY` is set. It uses your key on your computer. The search API never sees it.
+
+Safety notes:
+
+- All tools are read-only. None can write to a database or read your files.
+- Inputs are checked: query length, `k`, and page paths (no `..`).
+- Results are plain documentation text. Treat them as data, not instructions.
+- Errors show short fixed messages, and the key is never included.
+
 ## Public search-only mode
 
 For a site anyone can visit, run the API with answers turned off. No AI key is involved, and the slow re-ranking model is never loaded, so it is cheap and hard to abuse.

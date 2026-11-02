@@ -18,12 +18,42 @@ HEADERS_EXTRA = {
 }
 
 
-class LLMError(Exception):
-    """A problem talking to OpenRouter. The message is safe to show to a user."""
+# Fixed texts that are safe to show to a visitor. An error carries a short reason
+# code, and the text is looked up here, so no raw exception text can ever reach a response.
+MESSAGES = {
+    "missing_key": "Please enter your OpenRouter API key.",
+    "odd_key": "That API key does not look right.",
+    "bad_key": "OpenRouter rejected the API key.",
+    "no_credits": "Your OpenRouter account has no credits left.",
+    "rate_limited": "OpenRouter says there are too many requests. Try again soon.",
+    "bad_request": "OpenRouter did not accept the request. Check the model name.",
+    "provider_error": "OpenRouter returned an error.",
+    "unreachable": "Could not reach OpenRouter.",
+    "bad_reply": "OpenRouter sent a reply in an unexpected shape.",
+    "stream_error": "OpenRouter stopped the answer with an error.",
+}
+STATUS = {
+    "missing_key": 401,
+    "odd_key": 401,
+    "bad_key": 401,
+    "no_credits": 402,
+    "rate_limited": 429,
+    "bad_request": 400,
+}
 
-    def __init__(self, message: str, status_code: int = 502):
-        super().__init__(message)
-        self.status_code = status_code
+
+class LLMError(Exception):
+    """A problem talking to OpenRouter, described by a short reason code."""
+
+    def __init__(self, reason: str):
+        super().__init__(reason)
+        self.reason = reason if reason in MESSAGES else "provider_error"
+        self.status_code = STATUS.get(self.reason, 502)
+
+
+def public_message(exc: LLMError) -> str:
+    """The fixed, visitor-safe text for an error."""
+    return MESSAGES[exc.reason]
 
 
 @dataclass
@@ -39,9 +69,9 @@ class LLMResult:
 def _clean_key(api_key: str | None) -> str:
     key = (api_key or "").strip()
     if not key:
-        raise LLMError("Please enter your OpenRouter API key.", 401)
+        raise LLMError("missing_key")
     if any(ch in key for ch in "\r\n\t "):
-        raise LLMError("That API key does not look right.", 401)
+        raise LLMError("odd_key")
     return key
 
 
@@ -62,14 +92,14 @@ def _raise_for_status(response: httpx.Response) -> None:
         return
     code = response.status_code
     if code == 401:
-        raise LLMError("OpenRouter rejected the API key.", 401)
+        raise LLMError("bad_key")
     if code == 402:
-        raise LLMError("Your OpenRouter account has no credits left.", 402)
+        raise LLMError("no_credits")
     if code == 429:
-        raise LLMError("OpenRouter says there are too many requests. Try again soon.", 429)
+        raise LLMError("rate_limited")
     if code in (400, 404):
-        raise LLMError("OpenRouter did not accept the request. Check the model name.", 400)
-    raise LLMError(f"OpenRouter returned an error (status {code}).", 502)
+        raise LLMError("bad_request")
+    raise LLMError("provider_error")
 
 
 def _usage_fields(usage: dict | None) -> tuple[int | None, int | None, float | None]:
@@ -99,7 +129,7 @@ def chat(
             OPENROUTER_URL, headers=headers, json=_payload(messages, model, False)
         )
     except httpx.HTTPError as exc:
-        raise LLMError("Could not reach OpenRouter.", 502) from exc
+        raise LLMError("unreachable") from exc
     finally:
         if owns_client:
             client.close()
@@ -110,7 +140,7 @@ def chat(
     try:
         text = data["choices"][0]["message"]["content"] or ""
     except (KeyError, IndexError, TypeError) as exc:
-        raise LLMError("OpenRouter sent a reply in an unexpected shape.", 502) from exc
+        raise LLMError("bad_reply") from exc
     prompt_tokens, completion_tokens, cost = _usage_fields(data.get("usage"))
     return LLMResult(
         text=text.strip(),
@@ -157,7 +187,7 @@ def stream_chat(
                 except json.JSONDecodeError:
                     continue
                 if event.get("error"):
-                    raise LLMError("OpenRouter stopped the answer with an error.", 502)
+                    raise LLMError("stream_error")
                 served_model = event.get("model", served_model)
                 if event.get("usage"):
                     usage = event["usage"]
@@ -167,7 +197,7 @@ def stream_chat(
                         pieces.append(piece)
                         yield piece
     except httpx.HTTPError as exc:
-        raise LLMError("Could not reach OpenRouter.", 502) from exc
+        raise LLMError("unreachable") from exc
     finally:
         if owns_client:
             client.close()

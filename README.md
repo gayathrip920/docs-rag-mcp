@@ -2,14 +2,64 @@
 
 [![CI](https://github.com/gayathrip920/docs-rag-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/gayathrip920/docs-rag-mcp/actions/workflows/ci.yml)
 
-Ask questions about a public documentation set and get short answers with links back to the source pages.
+Ask questions about the FastAPI docs and get the best matching sections, or a short answer with numbered citations that link back to the source pages.
 
-You can use it two ways:
+![The search page after asking "How do I add CORS to my app?"](docs/images/search-page.jpg)
 
-- a chat web app
+You can use it three ways:
+
+- a web page for searching, and for written answers if you bring your own key
 - an MCP server, so any MCP-compatible tool can search the docs for you
+- a plain HTTP API
 
-This project is being built in small steps. Right now only the repo foundation is in place. The code, results tables and setup guide will be added as each piece lands.
+Contents: [How it fits together](#how-it-fits-together) | [Quick start](#quick-start) | [Search results](#search-results) | [How answers work](#how-answers-work) | [Running the API](#running-the-api) | [Web page](#web-page) | [MCP server](#use-it-as-an-mcp-server) | [Docker](#run-with-docker) | [Kubernetes](#run-on-kubernetes-local-with-kind) | [Public mode](#public-search-only-mode) | [Limits](#known-limits) | [Layout](#project-layout)
+
+## How it fits together
+
+```mermaid
+flowchart LR
+    subgraph Clients
+        W["Web page (Next.js)"]
+        M["MCP server (your computer)"]
+        H["Any HTTP client"]
+    end
+    A["API (FastAPI)"]
+    D[("Postgres + pgvector<br/>on Neon")]
+    O["OpenRouter<br/>(only if you bring a key)"]
+    I["Ingest script"]
+    S["FastAPI docs<br/>(pinned snapshot)"]
+
+    W --> A
+    M --> A
+    H --> A
+    A -->|"vector, keyword, re-rank"| D
+    A -.->|"your key, one request"| O
+    S --> I --> D
+```
+
+- **Ingest** cuts each doc page into chunks that keep their headings, turns each chunk into a vector, and stores both in Postgres.
+- **Search** can use vector search, vector plus keyword search, or both followed by a re-ranking model. The rest of this page shows how each one scored.
+- **Answers** are optional. The question and the top chunks go to a model on OpenRouter, using a key you provide for that one request.
+
+## Quick start
+
+You need Python 3.12, Docker, and a Postgres database with the pgvector extension (a free Neon project works).
+
+```bash
+cp .env.example .env                                   # put your DATABASE_URL in .env
+pip install -r requirements.txt -r requirements-ml.txt
+python -m rag.ingest                                   # loads and indexes the docs once
+docker compose up --build                              # page: http://localhost:3000
+```
+
+Then open the page and search. To get written answers, start the API with `ENABLE_ASK=true` (the default) and paste your own OpenRouter key into the page. More detail is in the sections below.
+
+To run the checks on your own computer:
+
+```bash
+pip install -r requirements-dev.txt
+ruff check . && ruff format --check . && pytest
+```
 
 ## Bring your own API key
 
@@ -207,6 +257,33 @@ The API only needs to read pages and write the query log. `deploy/sql/readonly_r
 ## Test questions
 
 `evals/questions.jsonl` has 60 questions, each with the doc page that answers it. `evals/out_of_scope.jsonl` has 10 questions the docs cannot answer, used to check that the app says "not found". Run `python evals/check_questions.py` to confirm every listed page exists.
+
+## Known limits
+
+I would rather list these here than have you find them.
+
+- **Answer quality is not measured yet.** The retrieval numbers above are real. The answer step is covered by tests with a fake model, but it has not been run against OpenRouter with a real key, so there are no scores for answer quality or cost per answer.
+- **Small test set.** 60 questions, each with one correct page. That is enough to compare methods roughly, not to prove small differences.
+- **One doc set, frozen.** It covers one pinned snapshot of the FastAPI docs, in English. It does not update itself.
+- **Re-ranking is slow on a CPU.** About 3 seconds a search in my runs, which is why the public setup uses vector search only.
+- **Rate limits live in memory.** They are counted per API process, so they reset on restart and are not shared if you run more than one copy. The Kubernetes files run one copy of each.
+- **Kubernetes is checked, not run.** The manifests pass a strict schema check in CI, and the same container settings were tested with Docker. They have not been tried on a real cluster yet.
+- **Not hosted.** There is no live demo link yet. The API image is about 2.5 GB because it carries two models, and it needs roughly 0.5 GB of memory in search-only mode.
+- **Questions are logged.** The text of each question, its timing and its cost go to the `queries` table so `/metrics` can work. API keys are never stored.
+
+## Project layout
+
+```text
+api/          FastAPI app: search, ask, pages, metrics, limits
+rag/          chunking, embeddings, database, search, answers, OpenRouter client
+mcp_server/   the MCP server and its small client for the API
+frontend/     Next.js web page
+evals/        test questions, metrics and the retrieval eval
+data/         the pinned FastAPI docs snapshot and its credit
+deploy/       Dockerfiles, Kubernetes files, read-only database role
+tests/        unit tests (no database or model needed)
+docs/         images used in this README
+```
 
 ## License
 

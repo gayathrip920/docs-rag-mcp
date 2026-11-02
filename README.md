@@ -64,6 +64,24 @@ The code is in `rag/answer.py` and `rag/llm.py`. The model is reached through Op
 
 The answer logic is covered by tests that use a fake model. It has not yet been tried against the real OpenRouter service, so no answer quality numbers exist yet.
 
+## Running the API
+
+```bash
+pip install -r requirements.txt -r requirements-ml.txt
+uvicorn api.main:app --port 8000
+```
+
+| Endpoint | What it does |
+|---|---|
+| `GET /health` | Says the server is up. Does not touch the database. |
+| `POST /search` | Returns the best chunks for a query. No API key needed. |
+| `POST /ask` | Returns a short answer with citations. Needs your OpenRouter key in the `X-OpenRouter-Key` header. |
+| `POST /ask/stream` | Same as `/ask` but streams the answer as it is written. |
+| `GET /pages/{path}` | Returns the full text of one doc page. |
+| `GET /metrics` | Question count, found rate, latency p50 and p95, and average cost. |
+
+The key is used for that one request only. It is not stored or logged, and the server has no key of its own to fall back on. There is a small per-visitor rate limit (`RATE_LIMIT_PER_MIN`, 30 by default) and the allowed web origins are set with `CORS_ORIGINS`.
+
 ## Test questions
 
 `evals/questions.jsonl` has 60 questions, each with the doc page that answers it. `evals/out_of_scope.jsonl` has 10 questions the docs cannot answer, used to check that the app says "not found". Run `python evals/check_questions.py` to confirm every listed page exists.

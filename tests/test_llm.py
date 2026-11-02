@@ -117,3 +117,11 @@ def test_stream_error_status_is_friendly():
         list(llm.stream_chat(MESSAGES, "m", SECRET, client=client_with(handler)))
     assert SECRET not in str(caught.value)
     assert caught.value.status_code == 401
+
+
+def test_error_text_comes_only_from_the_fixed_list():
+    odd = llm.LLMError("anything else, with a secret sk-or-123")
+    assert odd.reason == "provider_error"
+    assert odd.status_code == 502
+    assert llm.public_message(odd) == llm.MESSAGES["provider_error"]
+    assert "sk-or" not in llm.public_message(odd)

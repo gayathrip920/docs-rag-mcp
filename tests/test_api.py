@@ -94,7 +94,7 @@ def test_ask_without_a_key_is_a_clear_401(client, monkeypatch):
 
 def test_ask_maps_provider_errors_to_friendly_messages(client, monkeypatch):
     def fake_ask(*args, **kwargs):
-        raise llm.LLMError("Your OpenRouter account has no credits left.", 402)
+        raise llm.LLMError("no_credits")
 
     monkeypatch.setattr(main.answer_module, "answer_question", fake_ask)
     response = client.post("/ask", json={"question": "How?"}, headers={"X-OpenRouter-Key": SECRET})
@@ -126,7 +126,7 @@ def test_stream_sends_events_in_order(client, monkeypatch):
 
 def test_stream_turns_errors_into_an_error_event(client, monkeypatch):
     def fake_stream(*args, **kwargs):
-        raise llm.LLMError("OpenRouter rejected the API key.", 401)
+        raise llm.LLMError("bad_key")
         yield
 
     monkeypatch.setattr(main.answer_module, "answer_stream", fake_stream)

@@ -23,7 +23,7 @@ from pydantic import BaseModel, Field
 
 from rag import answer as answer_module
 from rag.db import connect
-from rag.llm import LLMError
+from rag.llm import LLMError, public_message
 from rag.retrieve import MODES, retrieve
 
 log = logging.getLogger("api")
@@ -119,7 +119,7 @@ def search(body: SearchRequest, request: Request):
 
 
 def _llm_http_error(exc: LLMError) -> HTTPException:
-    return HTTPException(exc.status_code, str(exc))
+    return HTTPException(exc.status_code, public_message(exc))
 
 
 @app.post("/ask")
@@ -167,7 +167,7 @@ def ask_stream(
                 ):
                     yield _sse(event)
         except LLMError as exc:
-            yield _sse({"type": "error", "message": str(exc)})
+            yield _sse({"type": "error", "message": public_message(exc)})
         except Exception:
             log.exception("stream failed")
             yield _sse({"type": "error", "message": "Something went wrong on the server."})

@@ -188,3 +188,7 @@ node_modules/
 frontend/out/
 *.local
 .model_cache/
+*.tsbuildinfo
+
+# The Python rule above ignores any folder named lib, but the web page needs frontend/lib.
+!frontend/lib/

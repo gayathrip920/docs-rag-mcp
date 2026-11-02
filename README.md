@@ -82,6 +82,24 @@ uvicorn api.main:app --port 8000
 
 The key is used for that one request only. It is not stored or logged, and the server has no key of its own to fall back on. The key is checked before any searching starts, so requests without one cost almost nothing. Limits and settings are listed below.
 
+## Web page
+
+The page is a small Next.js app in `frontend/`. It sends requests to `/api/...`, and Next forwards them to the Python API, so the browser never talks to the API directly.
+
+```bash
+cd frontend
+npm install
+API_URL=http://localhost:8000 npm run dev    # then open http://localhost:3000
+```
+
+- **Search** works for everyone and needs no key. Results link back to the exact doc section.
+- **Written answers** appear only when the API has `ENABLE_ASK=true`. The page then shows a box for your own OpenRouter key. The key stays in your browser tab (session storage) and is sent only with your question. It is not saved on the server.
+- In the public search-only setup, the key box and the Ask button are hidden.
+- Answers are shown as plain text, never as raw HTML. Links are only shown for https addresses.
+- `/metrics` shows question count, found rate, latency and cost for answered questions.
+
+`API_URL` is read when the app is built, so set it before `npm run build`.
+
 ## Public search-only mode
 
 For a site anyone can visit, run the API with answers turned off. No AI key is involved, and the slow re-ranking model is never loaded, so it is cheap and hard to abuse.

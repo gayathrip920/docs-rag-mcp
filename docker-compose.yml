@@ -1,0 +1,35 @@
+# Runs the API and the web page on your computer. The database stays on Neon.
+#
+#   cp .env.example .env     (then fill in DATABASE_URL)
+#   docker compose up --build
+#
+# Web page: http://localhost:3000     API: http://localhost:8000
+# Use a different env file with:  ENV_FILE=.env.reader docker compose up
+services:
+  api:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.api
+    image: docs-rag-api:local
+    env_file: ${ENV_FILE:-.env}
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.frontend
+      args:
+        API_URL: http://api:8000
+    image: docs-rag-web:local
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy

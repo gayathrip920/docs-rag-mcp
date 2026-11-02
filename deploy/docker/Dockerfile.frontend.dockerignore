@@ -1,0 +1,13 @@
+.git
+.claude
+.env
+.env.*
+data
+evals
+tests
+rag
+api
+mcp_server
+deploy
+frontend/node_modules
+frontend/.next

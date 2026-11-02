@@ -80,7 +80,34 @@ uvicorn api.main:app --port 8000
 | `GET /pages/{path}` | Returns the full text of one doc page. |
 | `GET /metrics` | Question count, found rate, latency p50 and p95, and average cost. |
 
-The key is used for that one request only. It is not stored or logged, and the server has no key of its own to fall back on. There is a small per-visitor rate limit (`RATE_LIMIT_PER_MIN`, 30 by default) and the allowed web origins are set with `CORS_ORIGINS`.
+The key is used for that one request only. It is not stored or logged, and the server has no key of its own to fall back on. The key is checked before any searching starts, so requests without one cost almost nothing. Limits and settings are listed below.
+
+## Public search-only mode
+
+For a site anyone can visit, run the API with answers turned off. No AI key is involved, and the slow re-ranking model is never loaded, so it is cheap and hard to abuse.
+
+```bash
+ENABLE_ASK=false SEARCH_MODES=vector DEFAULT_SEARCH_MODE=vector RATE_LIMIT_PER_MIN=30 GLOBAL_RATE_LIMIT_PER_MIN=200 MAX_CONCURRENT_SEARCHES=2 uvicorn api.main:app --port 8000
+```
+
+| Setting | What it does | Default |
+|---|---|---|
+| `ENABLE_ASK` | Turns `/ask` and `/ask/stream` on or off | `true` |
+| `SEARCH_MODES` | Which search methods visitors may use (`vector`, `hybrid`, `hybrid_rerank`) | all three |
+| `DEFAULT_SEARCH_MODE` | Method used when a request does not name one | `hybrid_rerank` |
+| `RATE_LIMIT_PER_MIN` | Calls per minute for each visitor | `30` |
+| `GLOBAL_RATE_LIMIT_PER_MIN` | Calls per minute for all visitors together (0 means off) | `0` |
+| `MAX_CONCURRENT_SEARCHES` | Searches allowed at the same time. Extra ones get a polite "busy" reply | `4` |
+| `POOL_MAX` | Most database connections kept open | `5` |
+| `CORS_ORIGINS` | Websites allowed to call the API from a browser | `http://localhost:3000` |
+
+`GET /config` tells the web page what is turned on. In public mode, a quick test on a laptop used about 470 MB of memory.
+
+Behind a proxy or ingress, every visitor can look like the same address. Start uvicorn with `FORWARDED_ALLOW_IPS` set to your proxy's address so the per-visitor limit sees the real visitor.
+
+### Use a read-only database login
+
+The API only needs to read pages and write the query log. `deploy/sql/readonly_role.sql` creates a login for that. Run it once as the owner with a strong password, then use that login in the API's `DATABASE_URL`. Keep the owner login for `rag.ingest` only.
 
 ## Test questions
 

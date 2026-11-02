@@ -142,6 +142,7 @@ def answer_question(
     k: int = 5,
     mode: str = "hybrid_rerank",
 ) -> AnswerResult:
+    llm.clean_key(api_key)  # fail fast, before the slow search
     started = time.perf_counter()
     hits = _find_hits(conn, question, k, mode)
 
@@ -167,6 +168,7 @@ def answer_stream(
     mode: str = "hybrid_rerank",
 ) -> Iterator[dict]:
     """Yield events: sources, then token pieces, then done with the checked answer."""
+    llm.clean_key(api_key)  # fail fast, before the slow search
     started = time.perf_counter()
     hits = _find_hits(conn, question, k, mode)
     yield {

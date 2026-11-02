@@ -1,7 +1,11 @@
 """Database connection and table setup (Postgres with pgvector, for example on Neon)."""
 
+import os
+import threading
+
 import psycopg
 from pgvector.psycopg import register_vector
+from psycopg_pool import ConnectionPool
 
 from rag.config import EMBEDDING_DIM, load_settings
 
@@ -43,18 +47,49 @@ CREATE TABLE IF NOT EXISTS queries (
 """
 
 
-def connect() -> psycopg.Connection:
-    """Open a connection. Needs DATABASE_URL to be set."""
+def _url() -> str:
     url = load_settings().database_url
     if not url:
         raise RuntimeError("DATABASE_URL is not set. Copy .env.example to .env and fill it in.")
+    return url
+
+
+def connect() -> psycopg.Connection:
+    """Open one connection. Used by scripts such as ingest and the evals."""
     # prepare_threshold=None keeps this working with Neon's pooled connection string.
-    conn = psycopg.connect(url, prepare_threshold=None)
-    # The extension must exist before the vector type can be registered.
-    conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
-    conn.commit()
-    register_vector(conn)
+    conn = psycopg.connect(_url(), prepare_threshold=None)
+    try:
+        register_vector(conn)
+    except psycopg.ProgrammingError:
+        # First run on a new database: the vector type does not exist yet.
+        conn.rollback()
+        conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
+        conn.commit()
+        register_vector(conn)
     return conn
+
+
+_pool: ConnectionPool | None = None
+_pool_lock = threading.Lock()
+
+
+def get_pool() -> ConnectionPool:
+    """A small shared pool for the web API, so each request does not open a new connection."""
+    global _pool
+    with _pool_lock:
+        if _pool is None:
+            _pool = ConnectionPool(
+                _url(),
+                min_size=1,
+                max_size=int(os.environ.get("POOL_MAX", "5")),
+                max_idle=240,  # drop idle connections before Neon suspends them
+                kwargs={"prepare_threshold": None},
+                configure=register_vector,
+                check=ConnectionPool.check_connection,
+                open=False,
+            )
+            _pool.open(wait=False)
+        return _pool
 
 
 def init_schema(conn: psycopg.Connection) -> None:

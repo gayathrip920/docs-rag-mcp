@@ -66,7 +66,7 @@ class LLMResult:
     latency_ms: int
 
 
-def _clean_key(api_key: str | None) -> str:
+def clean_key(api_key: str | None) -> str:
     key = (api_key or "").strip()
     if not key:
         raise LLMError("missing_key")
@@ -119,7 +119,7 @@ def chat(
     timeout: float = 60,
     client: httpx.Client | None = None,
 ) -> LLMResult:
-    key = _clean_key(api_key)
+    key = clean_key(api_key)
     headers = {"Authorization": f"Bearer {key}", **HEADERS_EXTRA}
     owns_client = client is None
     client = client or httpx.Client(timeout=timeout)
@@ -160,7 +160,7 @@ def stream_chat(
     client: httpx.Client | None = None,
 ) -> Iterator[str | LLMResult]:
     """Yield text pieces as they arrive, then one final LLMResult."""
-    key = _clean_key(api_key)
+    key = clean_key(api_key)
     headers = {"Authorization": f"Bearer {key}", **HEADERS_EXTRA}
     owns_client = client is None
     client = client or httpx.Client(timeout=timeout)

@@ -25,6 +25,11 @@ class Settings:
     rerank_model: str
     data_dir: Path
     docs_base_url: str
+    # Optional. The web app asks each visitor for their own key, so a public
+    # deployment should leave this empty. It is for local runs and evals.
+    openrouter_api_key: str
+    openrouter_model_dev: str
+    openrouter_model_eval: str
 
 
 def load_settings() -> Settings:
@@ -34,4 +39,7 @@ def load_settings() -> Settings:
         rerank_model=os.environ.get("RERANK_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2"),
         data_dir=Path(os.environ.get("DATA_DIR", ROOT / "data" / "raw")),
         docs_base_url=os.environ.get("DOCS_BASE_URL", "https://fastapi.tiangolo.com").rstrip("/"),
+        openrouter_api_key=os.environ.get("OPENROUTER_API_KEY", ""),
+        openrouter_model_dev=os.environ.get("OPENROUTER_MODEL_DEV", "openai/gpt-4o-mini"),
+        openrouter_model_eval=os.environ.get("OPENROUTER_MODEL_EVAL", "openai/gpt-4o-mini"),
     )

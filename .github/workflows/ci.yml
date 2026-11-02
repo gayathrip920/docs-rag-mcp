@@ -67,3 +67,39 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  docker:
+    name: Docker images build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/Dockerfile.api
+          push: false
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+
+      - name: Build web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/Dockerfile.frontend
+          push: false
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+
+  kubernetes:
+    name: Kubernetes files check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check manifests against the Kubernetes schemas
+        run: |
+          docker run --rm -v "$PWD/deploy/k8s:/k:ro" ghcr.io/yannh/kubeconform:latest             -strict -summary /k/namespace.yaml /k/configmap.yaml /k/secret.example.yaml             /k/api-deployment.yaml /k/api-service.yaml             /k/frontend-deployment.yaml /k/frontend-service.yaml

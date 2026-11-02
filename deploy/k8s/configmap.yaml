@@ -1,0 +1,18 @@
+# Settings that are fine to be public. Secrets go in the Secret, not here.
+# This is the public search-only setup: no answers, no AI key, cheap meaning search.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docs-rag-config
+  namespace: docs-rag
+data:
+  ENABLE_ASK: "false"
+  SEARCH_MODES: "vector"
+  DEFAULT_SEARCH_MODE: "vector"
+  RATE_LIMIT_PER_MIN: "30"
+  GLOBAL_RATE_LIMIT_PER_MIN: "200"
+  MAX_CONCURRENT_SEARCHES: "2"
+  POOL_MAX: "5"
+  # Websites allowed to call the API from a browser. The page uses the /api proxy,
+  # so this only matters if you call the API directly from another site.
+  CORS_ORIGINS: "http://localhost:3000"

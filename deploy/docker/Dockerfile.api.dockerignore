@@ -1,0 +1,12 @@
+# Keep secrets and bulky folders out of the API image.
+.git
+.claude
+.env
+.env.*
+data
+evals
+tests
+frontend
+mcp_server
+deploy
+**/__pycache__

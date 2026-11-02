@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Scripts and build files must keep Linux line endings, even when edited on Windows.
+*.sh text eol=lf
+Makefile text eol=lf
+Dockerfile* text eol=lf

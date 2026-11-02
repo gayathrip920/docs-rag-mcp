@@ -1,0 +1,12 @@
+# The page's server reaches the API at http://api:8000, so keep this name.
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: docs-rag
+spec:
+  selector:
+    app: api
+  ports:
+    - port: 8000
+      targetPort: 8000

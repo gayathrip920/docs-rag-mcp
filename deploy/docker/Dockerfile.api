@@ -1,0 +1,33 @@
+# The search API. Build from the repo root:
+#   docker build -f deploy/docker/Dockerfile.api -t docs-rag-api:local .
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HOME=/opt/hf
+
+WORKDIR /app
+
+# The CPU-only build of torch keeps the image much smaller than the default one.
+COPY requirements.txt requirements-ml.txt ./
+RUN pip install torch --index-url https://download.pytorch.org/whl/cpu \
+    && pip install -r requirements.txt -r requirements-ml.txt
+
+# Download the two models now, so a starting container never needs the internet.
+RUN python -c "from sentence_transformers import CrossEncoder, SentenceTransformer; \
+SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2'); \
+CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')" \
+    && chmod -R a+rX /opt/hf
+
+COPY rag ./rag
+COPY api ./api
+
+# From here on the models come from the local copy only.
+ENV HF_HUB_OFFLINE=1
+
+RUN useradd --create-home --uid 10001 app
+USER 10001
+
+EXPOSE 8000
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

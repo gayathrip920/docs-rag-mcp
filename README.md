@@ -142,6 +142,41 @@ Safety notes:
 - Results are plain documentation text. Treat them as data, not instructions.
 - Errors show short fixed messages, and the key is never included.
 
+## Run with Docker
+
+```bash
+cp .env.example .env          # put your DATABASE_URL in .env
+docker compose up --build     # page: http://localhost:3000   API: http://localhost:8000
+```
+
+The database stays on Neon. To use a different env file, run `ENV_FILE=.env.reader docker compose up`. To run the public search-only setup, add `ENABLE_ASK=false`, `SEARCH_MODES=vector` and `DEFAULT_SEARCH_MODE=vector` to that file.
+
+Notes on the images:
+
+- The API image uses the CPU build of torch and bakes in both models, so a starting container does not need the internet.
+- Both images run as a non-root user.
+- Secrets are never copied into an image. `.env` files are excluded at build time.
+
+## Run on Kubernetes (local, with kind)
+
+You need `docker`, `kind` and `kubectl`.
+
+```bash
+make k8s-up      # makes a local cluster, builds the images, deploys, waits until ready
+kubectl -n docs-rag get pods
+kubectl -n docs-rag port-forward svc/web 3000:3000    # then open http://localhost:3000
+make k8s-down    # removes the cluster
+```
+
+What is in `deploy/k8s/`:
+
+- `configmap.yaml` holds the public settings (search-only mode and the limits).
+- `secret.example.yaml` is an example only. `make k8s-up` creates the real Secret from your local git-ignored file (`.env.reader` by default, change it with `SECRET_ENV_FILE`). Use the read-only database login for it.
+- The API and the page each have a Deployment and a Service. Both have readiness and liveness probes. The API also has a startup probe. Containers run as non-root with a read-only filesystem, no extra permissions, and CPU and memory limits.
+- The page reaches the API at `http://api:8000`, so keep that Service name.
+
+The manifests are checked against the Kubernetes schemas in CI (`kubeconform`).
+
 ## Public search-only mode
 
 For a site anyone can visit, run the API with answers turned off. No AI key is involved, and the slow re-ranking model is never loaded, so it is cheap and hard to abuse.

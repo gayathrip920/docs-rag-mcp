@@ -114,6 +114,26 @@ The code is in `rag/answer.py` and `rag/llm.py`. The model is reached through Op
 
 The answer logic is covered by tests that use a fake model. It has not yet been tried against the real OpenRouter service, so no answer quality numbers exist yet.
 
+### Measuring answer quality
+
+`evals/run_answer_eval.py` asks all 70 test questions the way the app does, using your own key, and scores the replies:
+
+- **Answered rate:** for questions the docs cover, how often it gave an answer instead of "Not found".
+- **Valid citations:** how often the numbers it cited are real sources.
+- **Cites the correct page:** how often it cited the page that holds the right answer. A second number counts only the questions where that page was among the 5 chunks the model saw, which separates a search miss from a writing mistake.
+- **Correct refusals:** for the 10 questions the docs cannot answer, how often it said "Not found in the docs."
+- **Cost and time:** total cost, cost per question, and model time (median and p95).
+
+Run a cheap trial first, then the full run. It stops when the cost reaches `EVAL_MAX_COST_USD` (default 2.00), and it stops straight away if OpenRouter rejects the key.
+
+```bash
+export OPENROUTER_API_KEY=your-own-key      # never put it in a file you commit
+python -m evals.run_answer_eval --limit 3   # 3 questions of each kind
+python -m evals.run_answer_eval             # all 70
+```
+
+Results are saved to `evals/results/answers.json`, with the answer text for each question so you can read the misses. No answer scores are published here yet, because I have not run it with a real key.
+
 ## Running the API
 
 ```bash
@@ -278,7 +298,7 @@ The API only needs to read pages and write the query log. `deploy/sql/readonly_r
 
 I would rather list these here than have you find them.
 
-- **Answer quality is not measured yet.** The retrieval numbers above are real. The answer step is covered by tests with a fake model, but it has not been run against OpenRouter with a real key, so there are no scores for answer quality or cost per answer.
+- **Answer quality is not measured yet.** The retrieval numbers above are real. The answer step is covered by tests with a fake model, and the answer eval script is built and tested (see "Measuring answer quality"). It has not been run with a real key yet, so there are no scores for answer quality or cost per answer.
 - **Small test set.** 60 questions, each with one correct page. That is enough to compare methods roughly, not to prove small differences.
 - **One doc set, frozen.** It covers one pinned snapshot of the FastAPI docs, in English. It does not update itself.
 - **Re-ranking is slow on a CPU.** About 3 seconds a search in my runs, which is why the public setup uses vector search only.

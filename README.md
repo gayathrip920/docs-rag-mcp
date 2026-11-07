@@ -112,7 +112,7 @@ Things to keep in mind:
 
 The code is in `rag/answer.py` and `rag/llm.py`. The model is reached through OpenRouter, and the key is passed in with each request. It is not read from the server for the web app.
 
-The answer logic is covered by tests that use a fake model. It has not yet been tried against the real OpenRouter service, so no answer quality numbers exist yet.
+The answer logic is covered by tests that use a fake model, and it has also been scored against the real OpenRouter service. The numbers are in "Answer results" below.
 
 ### Measuring answer quality
 
@@ -132,7 +132,43 @@ python -m evals.run_answer_eval --limit 3   # 3 questions of each kind
 python -m evals.run_answer_eval             # all 70
 ```
 
-Results are saved to `evals/results/answers.json`, with the answer text for each question so you can read the misses. No answer scores are published here yet, because I have not run it with a real key.
+Results are saved to `evals/results/answers.json`, with the answer text for each question so you can read the misses.
+
+#### What happens during a run
+
+The picture below shows the whole run, here inside a Docker container. The container is only needed if your computer cannot load the model libraries directly. The only parts that cost money are the calls to OpenRouter, and the database is only read, never written.
+
+![The run: your terminal starts a Docker container, which installs packages, checks the key, loads the models, asks 70 questions using Neon and OpenRouter, and saves answers.json](docs/images/eval-run-overview.svg)
+
+The "ask 70 questions" step is a loop. For each question the script finds the 5 best chunks, asks the model, removes any citation that does not match a real source, scores the result, and then checks whether to stop. It stops if the cost cap is reached or if OpenRouter refuses the key.
+
+![One question: search, ask the model, check the reply, score it, then either move on to the next question or stop](docs/images/eval-question-loop.svg)
+
+#### Answer results
+
+Measured on 2026-11-07 with `openai/gpt-4o-mini`, using hybrid search plus re-ranking and the top 5 chunks. One run over all 70 questions.
+
+| Check | Result |
+|---|---|
+| Gave an answer to a question the docs cover | 58 of 60 (96.7%) |
+| Citations that point to real sources | 58 of 58 (100%) |
+| Cited the page that holds the correct answer | 55 of 60 (91.7%) |
+| Same, counting only questions where that page reached the model | 55 of 58 (94.8%) |
+| Said "Not found in the docs." for questions the docs cannot answer | 10 of 10 (100%) |
+| Cost | $0.017 for all 70, about $0.00024 per question |
+| Model time per answer (median / p95) | 2.8 s / 4.2 s |
+
+The five in-scope questions that did not cite the correct page:
+
+- **The right page never reached the model (q01, q42).** The model still wrote a confident answer from the wrong chunks, with real citation numbers. q01 is the same question the search eval missed. This shows that a valid citation does not prove a correct answer.
+- **The right page was there, but the model said "Not found" (q14, q59).** This is the model being too careful. Cookies and hiding the docs in production are both covered.
+- **The right page was there, but it cited a different page (q18).** The answer may still be fine, but it did not cite the expected page.
+
+Reading these numbers:
+
+- "Cites the correct page" is a stand-in for a good answer. I did not check every answer's wording by hand, so it does not prove the text is right.
+- It is one run with one model on 60 questions, so a gap of a few points is not strong evidence.
+- The answer step sees 5 chunks, and those can come from fewer than 5 pages. That may be why a few questions miss here that the page-level search table above counts as found.
 
 ## Running the API
 
@@ -298,7 +334,7 @@ The API only needs to read pages and write the query log. `deploy/sql/readonly_r
 
 I would rather list these here than have you find them.
 
-- **Answer quality is not measured yet.** The retrieval numbers above are real. The answer step is covered by tests with a fake model, and the answer eval script is built and tested (see "Measuring answer quality"). It has not been run with a real key yet, so there are no scores for answer quality or cost per answer.
+- **Answer quality is measured only roughly.** The answer eval checks that citations are real and that the right page is cited, not that every sentence is correct. It is one run with one model (see "Answer results"). A confident answer from the wrong chunks can still pass the citation check.
 - **Small test set.** 60 questions, each with one correct page. That is enough to compare methods roughly, not to prove small differences.
 - **One doc set, frozen.** It covers one pinned snapshot of the FastAPI docs, in English. It does not update itself.
 - **Re-ranking is slow on a CPU.** About 3 seconds a search in my runs, which is why the public setup uses vector search only.

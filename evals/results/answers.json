@@ -1,0 +1,628 @@
+{
+  "date": "2026-11-07",
+  "model": "openai/gpt-4o-mini",
+  "search_mode": "hybrid_rerank",
+  "cost_cap_usd": 2.0,
+  "status": "complete",
+  "summary": {
+    "in_scope_questions": 60,
+    "answered_rate": 0.9667,
+    "valid_citations_rate": 1.0,
+    "cites_correct_page_rate": 0.9167,
+    "cites_correct_page_when_it_was_retrieved": 0.9483,
+    "out_of_scope_questions": 10,
+    "correct_refusal_rate": 1.0
+  },
+  "cost_usd_total": 0.01674,
+  "cost_usd_per_question": 0.00024,
+  "answers_without_cost_info": 0,
+  "model_ms_p50": 2754.0,
+  "model_ms_p95": 4216.8,
+  "mean_model_ms": 2729.6,
+  "errors": [],
+  "in_scope": [
+    {
+      "id": "q01",
+      "question": "How do I create my first app and start the development server?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": false,
+      "cites_gold": false,
+      "answer": "To create your first app with a single SQLModel model, you can follow the guidance in the documentation. After setting up your app, you can start the development server using the `fastapi dev` command, which enables auto-reload by default.\n\nHere's a simple example of creating an app:\n\n```python\nfrom sqlmodel import SQLModel\n\nclass Item(SQLModel, table=True):\n    id: int\n    name: str\n\n# Create the app and database tables on startup\n```\n\nThen, run the server:\n\n```bash\nfastapi dev\n```\n\nThis will start the server in development mode, listening on your machine's IP address [1][3]."
+    },
+    {
+      "id": "q02",
+      "question": "How do I declare a variable in the URL path and have its type checked?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can declare a variable in the URL path by using path parameters with standard Python type annotations. For example, to declare a path parameter `item_id` as an `int`, you would do it like this:\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/items/{item_id}\")\nasync def read_item(item_id: int):\n    return {\"item_id\": item_id}\n```\n\nThis way, the type of `item_id` is checked to be an integer [2][5]."
+    },
+    {
+      "id": "q03",
+      "question": "How can a path parameter hold a whole file path like /files/home/me/a.txt?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can declare a path parameter to hold a whole file path by using the `:path` converter in the URL. For example, you can define a path like this:\n\n```\n/files/{file_path:path}\n```\n\nIn this case, `file_path` will match any path, allowing it to contain values like `/home/me/a.txt` [1]."
+    },
+    {
+      "id": "q04",
+      "question": "How do I restrict a path parameter to a fixed set of allowed values?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can restrict a path parameter to a fixed set of allowed values by using a standard Python `Enum`. First, create an `Enum` class with the predefined values, and then use it as the type annotation for your path parameter. \n\nExample:\n\n```python\nfrom enum import Enum\nfrom fastapi import FastAPI\n\nclass ModelName(str, Enum):\n    model_a = \"model_a\"\n    model_b = \"model_b\"\n\napp = FastAPI()\n\n@app.get(\"/items/{model_name}\")\nasync def get_item(model_name: ModelName):\n    return {\"model_name\": model_name}\n```\n\nIn this example, `model_name` can only be \"model_a\" or \"model_b\" [2][4]."
+    },
+    {
+      "id": "q05",
+      "question": "How do I declare optional query parameters with default values?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can declare optional query parameters by setting their default value to `None`. For example:\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/items/\")\nasync def read_items(q: str = None):\n    return {\"q\": q}\n```\n\nIn this case, the query parameter `q` is optional and will be `None` by default if not provided in the request [1]."
+    },
+    {
+      "id": "q06",
+      "question": "How do I make a query string parameter have a maximum length?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To make a query string parameter have a maximum length, you can use `Query` inside `Annotated` and set the `max_length` parameter. Here\u2019s an example:\n\n```Python\nfrom fastapi import FastAPI, Query\nfrom typing import Annotated\n\napp = FastAPI()\n\n@app.get(\"/items/\")\nasync def read_items(q: Annotated[str | None, Query(max_length=50)] = None):\n    return {\"q\": q}\n```\n\nThis setup ensures that the query parameter `q` has a maximum length of 50 characters [1]."
+    },
+    {
+      "id": "q07",
+      "question": "How do I require a path parameter to be greater than or equal to 1?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To require a path parameter to be greater than or equal to 1, you can use the `ge` constraint in your path parameter declaration. For example:\n\n```python\nfrom fastapi import FastAPI, Path\n\napp = FastAPI()\n\n@app.get(\"/items/{item_id}\")\nasync def read_item(item_id: int = Path(..., ge=1)):\n    return {\"item_id\": item_id}\n```\n\nIn this example, `item_id` must be an integer greater than or equal to 1 [2]."
+    },
+    {
+      "id": "q08",
+      "question": "How do I read a JSON request body into a typed model?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To read a JSON request body into a typed model in FastAPI, you declare your data model as a class that inherits from `BaseModel`. FastAPI will automatically read the body of the request as JSON, convert the types, and validate the data.\n\nHere\u2019s a simple example:\n\n```Python\nfrom pydantic import BaseModel\n\nclass Item(BaseModel):\n    name: str\n    description: str = None\n    price: float\n    tax: float = None\n\n# In your FastAPI route\n@app.post(\"/items/\")\nasync def create_item(item: Item):\n    return item\n```\n\nIn this example, the `item` parameter will contain the validated data from the JSON requ"
+    },
+    {
+      "id": "q09",
+      "question": "How do I combine path, query and body parameters in one function?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can combine path, query, and body parameters in one function by declaring them in the function signature. FastAPI will recognize each type and take the data from the correct place. For example:\n\n```python\nfrom fastapi import FastAPI, Query, Path, Body\n\napp = FastAPI()\n\n@app.post(\"/items/{item_id}\")\nasync def create_item(\n    item_id: int = Path(...),\n    q: str = Query(None),\n    item: dict = Body(...)\n):\n    return {\"item_id\": item_id, \"q\": q, \"item\": item}\n```\n\nIn this example, `item_id` is a path parameter, `q` is a query parameter, and `item` is a body parameter [1][2]."
+    },
+    {
+      "id": "q10",
+      "question": "How do I add validation and metadata to the fields inside a Pydantic model?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can add validation and metadata to the fields inside a Pydantic model using Pydantic's `Field`. For example:\n\n```python\nfrom pydantic import BaseModel, Field\n\nclass Item(BaseModel):\n    name: str = Field(..., title=\"The name of the item\", max_length=100)\n    price: float = Field(..., gt=0, description=\"The price must be greater than zero\")\n```\n\nThis allows you to declare extra validations and metadata for model attributes [1][2]."
+    },
+    {
+      "id": "q11",
+      "question": "How do I accept a list of sub-models inside a request body?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To accept a list of sub-models inside a request body, you can define an attribute in your Pydantic model as a list. For example:\n\n```python\nfrom typing import List\nfrom pydantic import BaseModel\n\nclass Tag(BaseModel):\n    name: str\n\nclass Item(BaseModel):\n    title: str\n    tags: List[Tag]  # This defines 'tags' as a list of 'Tag' sub-models\n```\n\nIn this example, the `Item` model has a `tags` attribute that is a list of `Tag` sub-models [5]."
+    },
+    {
+      "id": "q12",
+      "question": "How do I put example data into the generated API docs for a model?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can add example data to the generated API docs for a model by using the `examples` attribute in a Pydantic model. This can be done by setting `json_schema_extra` in the `model_config` or by using `Field(examples=[\"something\"])`. This example data will be included in the JSON Schema for that model, which is then reflected in the OpenAPI schema and the API documentation.\n\nHere\u2019s a small code example:\n\n```python\nfrom pydantic import BaseModel, Field\n\nclass Item(BaseModel):\n    name: str\n    description: str = Field(..., examples=[\"A sample item description\"])\n    \n    class Config:\n        sc"
+    },
+    {
+      "id": "q13",
+      "question": "Which special data types like UUID and datetime can I use in parameters?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can use the following special data types in parameters:\n\n- `UUID`: A standard \"Universally Unique Identifier\".\n- `datetime.datetime`: A Python `datetime.datetime`.\n- `datetime.date`: A Python `datetime.date`.\n- `datetime.time`: A Python `datetime.time`.\n- `datetime.timedelta`: A Python `datetime.timedelta`.\n- `frozenset`: Treated the same as a `set`.\n- `bytes`: Standard Python `bytes`.\n- `Decimal`: Standard Python `Decimal` [1]. \n\nFor example, you can declare a parameter using `datetime` like this:\n\n```Python\nfrom datetime import datetime\n\ndef example(date_param: datetime):\n    return date"
+    },
+    {
+      "id": "q14",
+      "question": "How do I read cookies sent by the client?",
+      "found": false,
+      "citations_valid": null,
+      "gold_in_context": true,
+      "cites_gold": false,
+      "answer": "Not found in the docs."
+    },
+    {
+      "id": "q15",
+      "question": "How do I read request headers, and what happens to underscores in the name?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To read request headers in FastAPI, you can declare them using the `Header` class. FastAPI automatically converts underscores in the parameter names to hyphens in the HTTP headers. For example, if you declare a header parameter as `user_agent`, it will be expected as `User-Agent` in the HTTP request.\n\nHere's a small code example:\n\n```python\nfrom fastapi import FastAPI, Header\n\napp = FastAPI()\n\n@app.get(\"/\")\nasync def read_headers(user_agent: str = Header(...)):\n    return {\"User-Agent\": user_agent}\n```\n\nIf you need to disable this automatic conversion, you can set the `convert_underscores` par"
+    },
+    {
+      "id": "q16",
+      "question": "How do I stop a password field from being returned in the response?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To stop a password field from being returned in the response, you can create an output model that does not include the password field. For example, if you have an input model `UserIn` that contains the password, you can declare a separate output model `UserOut` that excludes it. FastAPI will automatically filter out any data not declared in the output model.\n\nHere\u2019s a brief example:\n\n```python\nfrom pydantic import BaseModel\n\nclass UserIn(BaseModel):\n    username: str\n    password: str\n\nclass UserOut(BaseModel):\n    username: str\n\n# In your path operation\n@app.post(\"/users/\", response_model=Use"
+    },
+    {
+      "id": "q17",
+      "question": "How can I avoid repeating similar models for user input and output?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can avoid repeating similar models for user input and output by using separate models for input and output. For example, you can create an input model that includes the plaintext password and an output model that excludes it. FastAPI will handle filtering out the data not declared in the output model automatically. Here's a simple example:\n\n```python\nfrom pydantic import BaseModel\n\nclass UserIn(BaseModel):\n    username: str\n    password: str\n\nclass UserOut(BaseModel):\n    username: str\n\n# In your path operation, you can specify:\n# response_model=UserOut\n```\n\nThis way, the input model can h"
+    },
+    {
+      "id": "q18",
+      "question": "How do I make an endpoint answer with status code 201?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": false,
+      "answer": "To make an endpoint respond with status code 201, you can return a `JSONResponse` and set the `status_code` parameter to 201. Here\u2019s an example:\n\n```python\nfrom fastapi import FastAPI\nfrom fastapi.responses import JSONResponse\n\napp = FastAPI()\n\n@app.post(\"/items/\")\nasync def create_item(item: dict):\n    # Logic to create the item\n    return JSONResponse(content={\"message\": \"Item created\"}, status_code=201)\n```\n\nThis will return a 201 \"Created\" status code when a new item is created [2]."
+    },
+    {
+      "id": "q19",
+      "question": "How do I receive form fields instead of JSON?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To receive form fields instead of JSON in FastAPI, you can use the `Form` class. First, ensure you have installed `python-multipart`. Then, declare your form parameters in your path operation like this:\n\n```python\nfrom fastapi import FastAPI, Form\n\napp = FastAPI()\n\n@app.post(\"/submit/\")\nasync def submit_form(username: str = Form(...), password: str = Form(...)):\n    return {\"username\": username, \"password\": password}\n```\n\nThis way, the `username` and `password` will be received as form fields instead of JSON [1][5]."
+    },
+    {
+      "id": "q20",
+      "question": "How do I let users upload a file?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To allow users to upload a file in FastAPI, you can define a file parameter using the `UploadFile` type. Here\u2019s a simple example:\n\n```Python\nfrom fastapi import FastAPI, File, UploadFile\n\napp = FastAPI()\n\n@app.post(\"/uploadfile/\")\nasync def upload_file(file: UploadFile = File(...)):\n    contents = await file.read()\n    return {\"filename\": file.filename, \"content_type\": file.content_type}\n```\n\nIn this example, the `file` parameter is defined as an `UploadFile`, which allows users to upload a file when they make a POST request to the `/uploadfile/` endpoint [3][5]."
+    },
+    {
+      "id": "q21",
+      "question": "How do I accept both uploaded files and form fields in one request?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To accept both uploaded files and form fields in one request, you can use `File` and `Form` together in your FastAPI path operation. Here's a simple example:\n\n```python\nfrom fastapi import FastAPI, File, Form, UploadFile\n\napp = FastAPI()\n\n@app.post(\"/upload/\")\nasync def upload_file(file: UploadFile = File(...), name: str = Form(...)):\n    return {\"filename\": file.filename, \"name\": name}\n```\n\nMake sure to install `python-multipart` to handle the form data [2][5]."
+    },
+    {
+      "id": "q22",
+      "question": "How do I return an error with a custom message to the client?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To return an error with a custom message to the client, you can use the `HTTPException`. Here\u2019s a simple example:\n\n```python\nfrom fastapi import FastAPI, HTTPException\n\napp = FastAPI()\n\n@app.get(\"/items/{item_id}\")\nasync def read_item(item_id: int):\n    if item_id not in items:\n        raise HTTPException(status_code=404, detail=\"Item not found\")\n    return items[item_id]\n```\n\nIn this example, if the item is not found, it raises an `HTTPException` with a custom message \"Item not found\" and a status code of 404 [5]."
+    },
+    {
+      "id": "q23",
+      "question": "How do I add tags, a summary and a description to an endpoint?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To add tags, a summary, and a description to an endpoint in FastAPI, you can use the `tags`, `summary`, and `description` parameters in your path operation decorator. Here's an example:\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/items/{item_id}\", tags=[\"items\"], summary=\"Get an item\", description=\"Retrieve an item by its ID.\")\nasync def read_item(item_id: str):\n    return {\"item_id\": item_id}\n```\n\nIn this example, the endpoint has a tag \"items\", a summary \"Get an item\", and a description \"Retrieve an item by its ID.\" [1][4]."
+    },
+    {
+      "id": "q24",
+      "question": "How do I set the title, description and version shown in the API docs?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can set the title, description, and version for the API docs by using the `get_openapi()` function in your FastAPI application. Here\u2019s an example:\n\n```python\nfrom fastapi import FastAPI\nfrom fastapi.openapi.utils import get_openapi\n\napp = FastAPI()\n\ndef custom_openapi():\n    if app.openapi_schema:\n        return app.openapi_schema\n    app.openapi_schema = get_openapi(\n        title=\"My API\",\n        version=\"1.0.0\",\n        description=\"This is a description of my API.\",\n        routes=app.routes,\n    )\n    return app.openapi_schema\n\napp.openapi = custom_openapi\n```\n\nIn this example, the `"
+    },
+    {
+      "id": "q25",
+      "question": "How do I update only some fields of a stored item?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To update only some fields of a stored item, you can use the `PATCH` method with a Pydantic model that has optional fields. Here\u2019s a summary of the steps:\n\n1. Use `PATCH` instead of `PUT`.\n2. Retrieve the stored data.\n3. Put that data in a Pydantic model.\n4. Generate a `dict` without default values from the input model using `exclude_unset`.\n5. Create a copy of the stored model, updating its attributes with the received partial updates using the `update` parameter.\n6. Convert the copied model to a format suitable for storage (e.g., using `jsonable_encoder`).\n7. Save the updated data to your da"
+    },
+    {
+      "id": "q26",
+      "question": "How do I turn a model into JSON-compatible data before saving it to a database?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can use the `jsonable_encoder` function provided by FastAPI to convert a model into JSON-compatible data before saving it to a database. This function takes a Pydantic model and returns a dictionary that is compatible with JSON.\n\nFor example:\n\n```python\nfrom fastapi.encoders import jsonable_encoder\n\n# Assuming `my_model` is an instance of a Pydantic model\njson_compatible_data = jsonable_encoder(my_model)\n```\n\nThis will convert the Pydantic model to a `dict`, making it suitable for storage in a database [1][2]."
+    },
+    {
+      "id": "q27",
+      "question": "How do I share common logic between several endpoints?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can share common logic between several endpoints in FastAPI by using dependencies. You can define a dependency function and then use it in multiple path operations. Additionally, you can use `Annotated` to create type aliases for dependencies, which helps reduce code duplication and keeps type information intact.\n\nFor example:\n\n```Python\nfrom fastapi import Depends, FastAPI\nfrom typing import Annotated\n\napp = FastAPI()\n\ndef common_parameters(q: str = None):\n    return {\"q\": q}\n\ncommons: Annotated[dict, Depends(common_parameters)]\n\n@app.get(\"/items/\")\nasync def read_items(commons: dict = co"
+    },
+    {
+      "id": "q28",
+      "question": "Can I use a class instead of a function as a dependency?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "Yes, you can use a class as a dependency in FastAPI. When you declare a dependency using a class, FastAPI creates an instance of that class and passes it as a parameter to your function. For example:\n\n```Python\nclass CommonQueryParams:\n    def __init__(self, q: str = None, skip: int = 0, limit: int = 100):\n        self.q = q\n        self.skip = skip\n        self.limit = limit\n\n# FastAPI will call the CommonQueryParams class and pass the instance to your function.\n```\n\nThis shows that a Python class is also a callable, which FastAPI can use as a dependency [2][4]."
+    },
+    {
+      "id": "q29",
+      "question": "How do I close a database session after the response is sent?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To close a database session after the response is sent, you can use a dependency with `yield`. The code following the `yield` statement will be executed after the response is sent. Here\u2019s an example:\n\n```python\nfrom fastapi import Depends\n\nasync def get_db():\n    db = create_session()  # Create a new database session\n    try:\n        yield db  # This is where the session is injected into path operations\n    finally:\n        db.close()  # This will run after the response is sent\n```\n\nIn this example, the `db.close()` will be executed after the response is sent to the client [1]."
+    },
+    {
+      "id": "q30",
+      "question": "How do I apply one dependency to every route in my app?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can apply a dependency to every route in your FastAPI application by adding it to the `FastAPI` application itself. This way, the dependency will be applied to all the path operations in the application. \n\nFor example:\n\n```Python\nfrom fastapi import FastAPI, Depends\n\napp = FastAPI()\n\ndef common_dependency():\n    # Dependency logic here\n    pass\n\napp.dependency_overrides[common_dependency] = common_dependency\n```\n\nThis will ensure that `common_dependency` is executed for every request to any route in your app [2]."
+    },
+    {
+      "id": "q31",
+      "question": "How do I make a dependency that itself needs another dependency?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can create a dependency that itself needs another dependency by defining a \"dependable\" function that declares its own dependencies. For example:\n\n```python\nfrom fastapi import Depends\n\nasync def query_extractor(q: str = None):\n    return q\n\nasync def first_dependency(q: str = Depends(query_extractor)):\n    return q\n```\n\nIn this example, `first_dependency` depends on `query_extractor`, making it a \"dependant\" as well as a \"dependable\" [1]."
+    },
+    {
+      "id": "q32",
+      "question": "How do I add a dependency when I do not need its return value?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can add a dependency that you do not need the return value from by including a list of `dependencies` in the path operation decorator instead of declaring it as a parameter with `Depends`. \n\nExample:\n\n```Python\n@app.get(\"/items/\", dependencies=[Depends(some_dependency)])\nasync def read_items():\n    return [{\"item\": \"Item 1\"}, {\"item\": \"Item 2\"}]\n```\n\nIn this example, `some_dependency` will be executed, but its return value will not be used in the `read_items` function [1]."
+    },
+    {
+      "id": "q33",
+      "question": "How do I let a browser frontend on another domain call my API?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To allow a browser frontend on another domain to call your API, you need to configure Cross-Origin Resource Sharing (CORS) on your backend. This involves setting up a list of \"allowed origins\" in your backend that includes the frontend's domain. For example, if your frontend is running at `http://localhost:8080`, you must include this in your allowed origins list for the backend to authorize the communication.\n\nHere's a brief overview of the process:\n1. The frontend sends an HTTP `OPTIONS` request to the backend.\n2. The backend responds with appropriate headers that authorize the frontend's or"
+    },
+    {
+      "id": "q34",
+      "question": "How do I send an email after returning the response without making the client wait?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can define background tasks in FastAPI to send an email after returning a response. This allows the client to receive the response immediately while the email is sent in the background. \n\nFor example:\n\n```python\nfrom fastapi import FastAPI, BackgroundTasks\n\napp = FastAPI()\n\ndef send_email(email: str):\n    # Logic to send email\n    pass\n\n@app.post(\"/send-email/\")\nasync def send_email_endpoint(email: str, background_tasks: BackgroundTasks):\n    background_tasks.add_task(send_email, email)\n    return {\"message\": \"Email will be sent in the background.\"}\n```\n\nThis way, the email sending operati"
+    },
+    {
+      "id": "q35",
+      "question": "How do I serve images and CSS files from a folder?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To serve images and CSS files from a folder in FastAPI, you can use `StaticFiles`. Here\u2019s a simple example:\n\n```python\nfrom fastapi import FastAPI\nfrom fastapi.staticfiles import StaticFiles\n\napp = FastAPI()\n\napp.mount(\"/static\", StaticFiles(directory=\"static\"), name=\"static\")\n```\n\nIn this example, files in the `static` directory, such as images and CSS files, will be served at the URL `/static/filename` [1][4]."
+    },
+    {
+      "id": "q36",
+      "question": "How do I add a header to every response with a middleware?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To add a header to every response with a middleware, you can create a middleware function that modifies the response before returning it. Here\u2019s an example:\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.middleware(\"http\")\nasync def add_custom_header(request, call_next):\n    response = await call_next(request)\n    response.headers[\"X-Custom-Header\"] = \"Value\"\n    return response\n```\n\nThis middleware adds a custom header `X-Custom-Header` to every response [1][2]."
+    },
+    {
+      "id": "q37",
+      "question": "How do I split a large app across several files?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can split a large FastAPI application across several files by organizing your code into modules and submodules using `APIRouter`. For example, you can create separate files for different functionalities, such as users and items, and include them in your main application file. \n\nHere\u2019s an example file structure:\n\n```\n.\n\u251c\u2500\u2500 app\n\u2502   \u251c\u2500\u2500 __init__.py\n\u2502   \u251c\u2500\u2500 main.py\n\u2502   \u251c\u2500\u2500 dependencies.py\n\u2502   \u2514\u2500\u2500 routers\n\u2502       \u251c\u2500\u2500 __init__.py\n\u2502       \u251c\u2500\u2500 items.py\n\u2502       \u2514\u2500\u2500 users.py\n\u2502   \u2514\u2500\u2500 internal\n\u2502       \u251c\u2500\u2500 __init__.py\n\u2502       \u2514\u2500\u2500 admin.py\n```\n\nIn `app/main.py`, you could import and include the routers "
+    },
+    {
+      "id": "q38",
+      "question": "How do I write automated tests for my endpoints?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To write automated tests for your FastAPI endpoints, you can use the `TestClient`. Here\u2019s a simple example:\n\n1. Install `httpx`:\n   ```bash\n   $ uv add httpx\n   ```\n\n2. Import `TestClient` and create a client instance:\n   ```python\n   from fastapi import FastAPI\n   from fastapi.testclient import TestClient\n\n   app = FastAPI()\n\n   @app.get(\"/items/{item_id}\")\n   def read_item(item_id: int):\n       return {\"item_id\": item_id}\n\n   client = TestClient(app)\n   ```\n\n3. Write test functions starting with `test_`:\n   ```python\n   def test_read_item():\n       response = client.get(\"/items/1\")\n       as"
+    },
+    {
+      "id": "q39",
+      "question": "How do I connect my app to a SQL database?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To connect your app to a SQL database, you need to create an `engine` using SQLModel, which holds the connections to the database. You should have one single `engine` object for your application. Here's a simple example:\n\n```python\nfrom sqlmodel import create_engine\n\nengine = create_engine(\"sqlite:///database.db\", connect_args={\"check_same_thread\": False})\n```\n\nThis allows FastAPI to use the same SQLite database in different threads, ensuring a single SQLModel session per request later on [1]."
+    },
+    {
+      "id": "q40",
+      "question": "How do I set up a basic login flow with a token?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To set up a basic login flow with a token using FastAPI, follow these steps:\n\n1. **User submits credentials**: The user types their `username` and `password` in the frontend and sends them to the API at a specific URL (e.g., `/token`).\n\n2. **API validates credentials**: The API checks the provided `username` and `password`. If valid, it responds with a token.\n\n3. **Token structure**: The response should be a JSON object containing an `access_token` and a `token_type`. For example:\n   ```json\n   {\n       \"access_token\": \"your_token_here\",\n       \"token_type\": \"bearer\"\n   }\n   ```\n\n4. **Using th"
+    },
+    {
+      "id": "q41",
+      "question": "How do I hash passwords and create JWT access tokens?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To hash passwords, you can use the `pwdlib` library to create a `PasswordHash` instance. This instance will be used for hashing and verifying passwords. Here's a utility function example to hash a password:\n\n```python\nfrom pwdlib import PasswordHash\n\ndef hash_password(password: str) -> str:\n    pwd_context = PasswordHash()\n    return pwd_context.hash(password)\n```\n\nTo create JWT access tokens, you need to define a secret key and an algorithm. Here's a simple example:\n\n```python\nimport jwt\nfrom datetime import timedelta\n\nSECRET_KEY = \"your_random_secret_key\"\nALGORITHM = \"HS256\"\nexpiration = tim"
+    },
+    {
+      "id": "q42",
+      "question": "How do I find out which user is making the request from their token?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": false,
+      "cites_gold": false,
+      "answer": "To find out which user is making the request from their token, you can decode the JWT token and verify it to return the current user. This is typically done in a function like `get_current_user`, which processes the token and retrieves the user's information. If the token is invalid, it will return an HTTP error immediately.\n\nHere\u2019s a brief example of how this might look:\n\n```python\ndef get_current_user(token: str):\n    # Decode and verify the token here\n    # Return the current user based on the token\n```\n\nThis approach ensures that you can identify the user associated with the token provided"
+    },
+    {
+      "id": "q43",
+      "question": "How do I run my app from a Python file so I can attach a debugger?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can run your FastAPI app from a Python file and attach a debugger by using your IDE's debugging features. For example, in Visual Studio Code, you can:\n\n1. Go to the \"Debug\" panel.\n2. \"Add configuration...\".\n3. Select \"Python\".\n4. Run the debugger with the option \"`Python: Current File (Integrated Terminal)`\".\n\nThis will start the server with your FastAPI code and stop at your breakpoints [1]. \n\nIn PyCharm, you can:\n\n1. Open the \"Run\" menu.\n2. Select \"Debug...\".\n3. Choose the file to debug (e.g., `main.py`).\n\nThis will also start the server and stop at your breakpoints [1]."
+    },
+    {
+      "id": "q44",
+      "question": "How do I stream Server-Sent Events to the browser?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To stream Server-Sent Events (SSE) to the browser using FastAPI, you need to use `yield` in your path operation function and set `response_class=EventSourceResponse`. Here's a small code example:\n\n```python\nfrom fastapi import FastAPI\nfrom fastapi.sse import EventSourceResponse\n\napp = FastAPI()\n\n@app.get(\"/sse\", response_class=EventSourceResponse)\nasync def sse():\n    async def event_generator():\n        while True:\n            yield {\"data\": {\"name\": \"Portal Gun\", \"price\": 999.99}}\n    return EventSourceResponse(event_generator())\n```\n\nEach yielded item is encoded as JSON and sent in the `dat"
+    },
+    {
+      "id": "q45",
+      "question": "How do I stream a sequence of JSON objects one per line?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To stream a sequence of JSON objects one per line using FastAPI, you can use the `yield` statement in your path operation function. You should declare the return type as `AsyncIterable[Item]`, where `Item` is a Pydantic model representing the JSON object.\n\nHere\u2019s a simple example:\n\n```python\nfrom fastapi import FastAPI\nfrom pydantic import BaseModel\nfrom typing import AsyncIterable\n\napp = FastAPI()\n\nclass Item(BaseModel):\n    name: str\n    description: str\n\n@app.get(\"/items/\", response_model=AsyncIterable[Item])\nasync def stream_items() -> AsyncIterable[Item]:\n    yield Item(name=\"Plumbus\", de"
+    },
+    {
+      "id": "q46",
+      "question": "How do I package my app in a Docker image?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To package your FastAPI app in a Docker image, follow these steps:\n\n1. Create a `Dockerfile` in your project directory. For a single-file FastAPI app, it might look like this:\n\n   ```dockerfile\n   FROM python:3.14\n\n   WORKDIR /code\n\n   COPY ./requirements.txt /code/requirements.txt\n\n   RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt\n\n   COPY ./main.py /code/\n\n   CMD [\"fastapi\", \"run\", \"main.py\", \"--port\", \"80\"]\n   ```\n\n   If your app is in an `app` directory, the `Dockerfile` would look like this:\n\n   ```dockerfile\n   FROM python:3.14\n\n   WORKDIR /code\n\n   COPY ./requirement"
+    },
+    {
+      "id": "q47",
+      "question": "How do I run several worker processes of my server?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can run several worker processes of your server by using the `--workers` CLI option with the `fastapi` or `uvicorn` commands. This allows you to take advantage of multi-core CPUs and run multiple processes in parallel. For example:\n\n```bash\nuvicorn main:app --workers 4\n```\n\nThis command would start 4 worker processes to handle requests concurrently [1][4]."
+    },
+    {
+      "id": "q48",
+      "question": "How do I deploy my app to FastAPI Cloud?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can deploy your FastAPI app to FastAPI Cloud with a single command:\n\n```console\n$ uv run fastapi deploy\n```\n\nThe CLI will automatically detect your FastAPI application and deploy it to the cloud. If you are not logged in, your browser will open to complete the authentication process. Once deployed, your app will be accessible at a provided URL [1][2][3]."
+    },
+    {
+      "id": "q49",
+      "question": "What is HTTPS and how does it work for my deployed app?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "HTTPS (HyperText Transfer Protocol Secure) provides encryption for your API, ensuring secure communication over the internet. It is typically managed by an external component known as a TLS Termination Proxy, which handles the HTTPS requests and manages the renewal of HTTPS certificates. This setup allows multiple applications to run on the same server while the TLS Termination Proxy manages the secure connections for them [1][5]."
+    },
+    {
+      "id": "q50",
+      "question": "How should I pin the version of the framework in my requirements?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can pin the version of FastAPI in your `requirements.txt` file like this:\n\n```txt\nfastapi[standard]==0.112.0\n```\n\nOr you can specify a range of acceptable versions:\n\n```txt\nfastapi[standard]>=0.112.0,<0.113.0\n```\n\nThis means you would use version `0.112.0` or above, but less than `0.113.0` [1]."
+    },
+    {
+      "id": "q51",
+      "question": "How do I run my app behind a proxy that adds a path prefix?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To run your app behind a proxy that adds a path prefix, you can use the command line option `--root-path` when starting your FastAPI application. For example, if your proxy adds a path prefix of `/api/v1`, you would start your server like this:\n\n```console\n$ uv run fastapi run main.py --forwarded-allow-ips=\"*\" --root-path /api/v1\n```\n\nThis configuration allows your application to handle requests correctly as if it were served at the original path, while the proxy manages the prefix [1][4]."
+    },
+    {
+      "id": "q52",
+      "question": "How do I read app settings from environment variables?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To read app settings from environment variables, you can create a subclass of `BaseSettings` from Pydantic and declare class attributes with type annotations. When you create an instance of that class, Pydantic will read the environment variables in a case-insensitive way. For example:\n\n```python\nfrom pydantic import BaseSettings\n\nclass Settings(BaseSettings):\n    app_name: str\n    admin_email: str\n\nsettings = Settings()\n```\n\nIn this example, `app_name` and `admin_email` will be populated from the corresponding environment variables `APP_NAME` and `ADMIN_EMAIL` [1]."
+    },
+    {
+      "id": "q53",
+      "question": "How do I run code when the app starts and when it shuts down?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can run code when the app starts and shuts down by using the `lifespan` parameter of the `FastAPI` app. You define an async function with `yield` to handle startup and shutdown logic. Here's an example:\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\nasync def lifespan(app):\n    # Code to run at startup\n    yield\n    # Code to run at shutdown\n\napp.lifespan = lifespan\n```\n\nAlternatively, you can use `startup` and `shutdown` event handlers directly, but if you use `lifespan`, the event handlers will not be called [2][4]."
+    },
+    {
+      "id": "q54",
+      "question": "How do I add a WebSocket endpoint?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To add a WebSocket endpoint in your FastAPI application, you can create a `websocket` using FastAPI's built-in `WebSocket`. Here\u2019s a simple example:\n\n```python\nfrom fastapi import FastAPI, WebSocket\n\napp = FastAPI()\n\n@app.websocket(\"/ws\")\nasync def websocket_endpoint(websocket: WebSocket):\n    await websocket.accept()\n    while True:\n        data = await websocket.receive_text()\n        await websocket.send_text(f\"Message text was: {data}\")\n```\n\nThis code defines a WebSocket endpoint at `/ws` that accepts connections and echoes back received messages [5]."
+    },
+    {
+      "id": "q55",
+      "question": "How do I return HTML or plain text instead of JSON?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To return HTML or plain text instead of JSON in FastAPI, you can create a custom response class by inheriting from `Response`. You can specify the content type in the response class. For example:\n\n```python\nfrom fastapi import FastAPI\nfrom fastapi.responses import Response\n\napp = FastAPI()\n\nclass CustomHTMLResponse(Response):\n    media_type = \"text/html\"\n\n@app.get(\"/html\", response_class=CustomHTMLResponse)\nasync def get_html():\n    return \"<h1>Hello World</h1>\"\n```\n\nThis way, you can return HTML content instead of the default JSON response [1][2]."
+    },
+    {
+      "id": "q56",
+      "question": "How do I return a response directly and skip the usual JSON conversion?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "You can return a response directly by returning a `Response` or any subclass of it, such as `JSONResponse`. This allows you to skip the usual JSON conversion that FastAPI performs. Here's a simple example:\n\n```python\nfrom fastapi import FastAPI\nfrom starlette.responses import JSONResponse\n\napp = FastAPI()\n\n@app.get(\"/custom-response\")\nasync def custom_response():\n    return JSONResponse(content={\"message\": \"This is a custom response\"})\n```\n\nIn this case, FastAPI will pass the `JSONResponse` directly without converting the data using Pydantic models [1][2]."
+    },
+    {
+      "id": "q57",
+      "question": "How do I document extra possible responses in the OpenAPI schema?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To document extra possible responses in the OpenAPI schema, you can declare additional responses using the `responses` parameter in your FastAPI path operation. This allows you to specify additional status codes, media types, descriptions, etc. \n\nFor example:\n\n```python\nfrom fastapi import FastAPI\nfrom fastapi.responses import JSONResponse\n\napp = FastAPI()\n\n@app.get(\"/items/{item_id}\", responses={404: {\"description\": \"Item not found\"}})\nasync def read_item(item_id: int):\n    return JSONResponse(status_code=200, content={\"item_id\": item_id})\n```\n\nIn this example, a 404 response is documented wi"
+    },
+    {
+      "id": "q58",
+      "question": "How do I generate client SDK code for my API?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "To generate client SDK code for your API, you can use the Hey API tool with the following command:\n\n```sh\nnpx @hey-api/openapi-ts -i http://localhost:8000/openapi.json -o src/client\n```\n\nThis command will generate a TypeScript SDK in the `./src/client` directory, using the OpenAPI schema from your FastAPI app [2][3]."
+    },
+    {
+      "id": "q59",
+      "question": "How do I hide the interactive docs in production?",
+      "found": false,
+      "citations_valid": null,
+      "gold_in_context": true,
+      "cites_gold": false,
+      "answer": "Not found in the docs."
+    },
+    {
+      "id": "q60",
+      "question": "When should I use async def and when a normal def?",
+      "found": true,
+      "citations_valid": true,
+      "gold_in_context": true,
+      "cites_gold": true,
+      "answer": "Use `async def` when your path operation functions need to call third-party libraries that require `await`, or if your application doesn't need to wait for external responses. For example:\n\n```Python\n@app.get(\"/\")\nasync def read_results():\n    results = await some_library()\n    return results\n```\n\nUse normal `def` when dealing with libraries that do not support `await`, like most database libraries, or if you are unsure. For example:\n\n```Python\n@app.get(\"/\")\ndef results():\n    results = some_library()\n    return results\n```\n\nYou can mix both `def` and `async def` as needed, and FastAPI will ha"
+    }
+  ],
+  "out_of_scope": [
+    {
+      "id": "o01",
+      "question": "What is the capital of France?",
+      "found": false,
+      "answer": "Not found in the docs."
+    },
+    {
+      "id": "o02",
+      "question": "How do I write Django ORM migrations?",
+      "found": false,
+      "answer": "Not found in the docs."
+    },
+    {
+      "id": "o03",
+      "question": "How do I train a neural network with PyTorch?",
+      "found": false,
+      "answer": "Not found in the docs."
+    },
+    {
+      "id": "o04",
+      "question": "How do I set up an Ingress controller in Kubernetes?",
+      "found": false,
+      "answer": "Not found in the docs."
+    },
+    {
+      "id": "o05",
+      "question": "What is the best recipe for chocolate chip cookies?",
+      "found": false,
+      "answer": "Not found in the docs."
+    },
+    {
+      "id": "o06",
+      "question": "How do I use getServerSideProps in Next.js?",
+      "found": false,
+      "answer": "Not found in the docs."
+    },
+    {
+      "id": "o07",
+      "question": "How do I configure a Redis cluster with sharding?",
+      "found": false,
+      "answer": "Not found in the docs."
+    },
+    {
+      "id": "o08",
+      "question": "How do I build a REST API in Rust with Axum?",
+      "found": false,
+      "answer": "Not found in the docs."
+    },
+    {
+      "id": "o09",
+      "question": "What is the weather like in Tokyo today?",
+      "found": false,
+      "answer": "Not found in the docs."
+    },
+    {
+      "id": "o10",
+      "question": "How do I define blueprints and templates in Laravel?",
+      "found": false,
+      "answer": "Not found in the docs."
+    }
+  ],
+  "note": "cites_correct_page_rate is the share of in-scope questions where the answer cites the page that holds the correct answer. The 'when_it_was_retrieved' version only counts questions where that page was among the 5 chunks the model saw."
+}

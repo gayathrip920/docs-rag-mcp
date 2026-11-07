@@ -182,6 +182,7 @@ cython_debug/
 # Project: secrets and local files
 .env.*
 !.env.example
+!.env.public.example
 deploy/k8s/secret.yaml
 node_modules/
 .next/

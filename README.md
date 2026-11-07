@@ -218,6 +218,22 @@ kubectl -n docs-rag port-forward svc/web 3000:3000    # then open http://localho
 make k8s-down    # removes the cluster
 ```
 
+### Already have a cluster?
+
+If you turned on Kubernetes in Docker Desktop (or have any other cluster), you do not need `kind`. Build the images, then apply the files yourself:
+
+```bash
+make docker-build
+kubectl apply -f deploy/k8s/namespace.yaml -f deploy/k8s/configmap.yaml
+kubectl -n docs-rag create secret generic docs-rag-secrets \
+  --from-literal=DATABASE_URL="$(grep '^DATABASE_URL=' .env.reader | cut -d= -f2-)"
+kubectl apply -f deploy/k8s/api-deployment.yaml -f deploy/k8s/api-service.yaml \
+  -f deploy/k8s/frontend-deployment.yaml -f deploy/k8s/frontend-service.yaml
+kubectl -n docs-rag get pods -w
+```
+
+This is the route I tested on Docker Desktop's built-in cluster. Both pods became ready, a search through the page worked, `/ask` was refused as intended, the API ran as a non-root user on a read-only disk, and a deleted API pod was replaced in seconds. To remove it: `kubectl delete namespace docs-rag`.
+
 What is in `deploy/k8s/`:
 
 - `configmap.yaml` holds the public settings (search-only mode and the limits).
@@ -267,7 +283,7 @@ I would rather list these here than have you find them.
 - **One doc set, frozen.** It covers one pinned snapshot of the FastAPI docs, in English. It does not update itself.
 - **Re-ranking is slow on a CPU.** About 3 seconds a search in my runs, which is why the public setup uses vector search only.
 - **Rate limits live in memory.** They are counted per API process, so they reset on restart and are not shared if you run more than one copy. The Kubernetes files run one copy of each.
-- **Kubernetes is checked, not run.** The manifests pass a strict schema check in CI, and the same container settings were tested with Docker. They have not been tried on a real cluster yet.
+- **Kubernetes was tried on one local cluster only.** The manifests pass a strict schema check in CI and ran on Docker Desktop's built-in cluster. The `make k8s-up` script, which uses `kind`, has not been run, and nothing has been tried on a cloud cluster.
 - **Not hosted.** There is no live demo link yet. The API image is about 2.5 GB because it carries two models, and it needs roughly 0.5 GB of memory in search-only mode.
 - **Questions are logged.** The text of each question, its timing and its cost go to the `queries` table so `/metrics` can work. API keys are never stored.
 

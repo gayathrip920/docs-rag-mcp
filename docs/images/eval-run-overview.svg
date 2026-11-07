@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="460" viewBox="0 0 680 460" role="img" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<title>What happens when you run the answer eval</title>
+<desc>Your terminal starts a Docker container. Inside it the script installs packages, checks the key and loads models, asks 70 questions using Neon and OpenRouter, and saves answers.json to your disk.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect width="680" height="460" rx="12" fill="#FFFFFF" stroke="#D3D1C7" stroke-width="1"/>
+<rect x="30" y="190" width="130" height="56" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1"/>
+<text x="95.0" y="208" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#444441">Your terminal</text>
+<text x="95.0" y="228" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#5F5E5A">docker run ...</text>
+<line x1="162" y1="218" x2="188" y2="218" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="190" y="40" width="250" height="380" rx="20" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+<text x="315.0" y="64" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#3C3489">Docker container</text>
+<text x="315.0" y="82" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#534AB7">Python, models, eval script</text>
+<rect x="210" y="100" width="210" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+<text x="315.0" y="118" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#085041">Install packages</text>
+<text x="315.0" y="138" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0F6E56">pip, a few seconds</text>
+<rect x="210" y="180" width="210" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+<text x="315.0" y="198" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#085041">Check key, load models</text>
+<text x="315.0" y="218" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0F6E56">stops if key is missing</text>
+<rect x="210" y="260" width="210" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+<text x="315.0" y="278" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#085041">Ask 70 questions</text>
+<text x="315.0" y="298" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0F6E56">the loop, shown next</text>
+<rect x="210" y="340" width="210" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+<text x="315.0" y="358" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#085041">Save results</text>
+<text x="315.0" y="378" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0F6E56">unless the key fails</text>
+<line x1="315" y1="158" x2="315" y2="178" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#a)"/>
+<line x1="315" y1="238" x2="315" y2="258" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#a)"/>
+<line x1="315" y1="318" x2="315" y2="338" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="480" y="200" width="160" height="56" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1"/>
+<text x="560.0" y="218" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#444441">Neon database</text>
+<text x="560.0" y="238" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#5F5E5A">finds 5 best chunks</text>
+<rect x="480" y="320" width="160" height="56" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1"/>
+<text x="560.0" y="338" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#444441">OpenRouter</text>
+<text x="560.0" y="358" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#5F5E5A">writes the answer</text>
+<line x1="422" y1="278" x2="478" y2="244" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#a)"/>
+<line x1="422" y1="298" x2="478" y2="332" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="30" y="340" width="140" height="56" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1"/>
+<text x="100.0" y="358" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="600" fill="#444441">answers.json</text>
+<text x="100.0" y="378" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#5F5E5A">on your disk</text>
+<line x1="208" y1="368" x2="172" y2="368" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#a)"/>
+</svg>

@@ -134,6 +134,16 @@ python -m evals.run_answer_eval             # all 70
 
 Results are saved to `evals/results/answers.json`, with the answer text for each question so you can read the misses.
 
+#### What happens during a run
+
+The picture below shows the whole run, here inside a Docker container. The container is only needed if your computer cannot load the model libraries directly. The only parts that cost money are the calls to OpenRouter, and the database is only read, never written.
+
+![The run: your terminal starts a Docker container, which installs packages, checks the key, loads the models, asks 70 questions using Neon and OpenRouter, and saves answers.json](docs/images/eval-run-overview.svg)
+
+The "ask 70 questions" step is a loop. For each question the script finds the 5 best chunks, asks the model, removes any citation that does not match a real source, scores the result, and then checks whether to stop. It stops if the cost cap is reached or if OpenRouter refuses the key.
+
+![One question: search, ask the model, check the reply, score it, then either move on to the next question or stop](docs/images/eval-question-loop.svg)
+
 #### Answer results
 
 Measured on 2026-11-07 with `openai/gpt-4o-mini`, using hybrid search plus re-ranking and the top 5 chunks. One run over all 70 questions.

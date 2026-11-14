@@ -12,7 +12,7 @@ You can use it three ways:
 - an MCP server, so any MCP-compatible tool can search the docs for you
 - a plain HTTP API
 
-Contents: [How it fits together](#how-it-fits-together) | [Quick start](#quick-start) | [Search results](#search-results) | [How answers work](#how-answers-work) | [Running the API](#running-the-api) | [Web page](#web-page) | [MCP server](#use-it-as-an-mcp-server) | [Docker](#run-with-docker) | [Kubernetes](#run-on-kubernetes-local-with-kind) | [Public mode](#public-search-only-mode) | [Limits](#known-limits) | [Layout](#project-layout)
+Contents: [How it fits together](#how-it-fits-together) | [Quick start](#quick-start) | [Search results](#search-results) | [How answers work](#how-answers-work) | [Running the API](#running-the-api) | [Web page](#web-page) | [MCP server](#use-it-as-an-mcp-server) | [Docker](#run-with-docker) | [Kubernetes](#run-on-kubernetes-local-with-kind) | [Public mode](#public-search-only-mode) | [Live demo](#show-it-live-from-your-own-computer) | [Limits](#known-limits) | [Layout](#project-layout)
 
 ## How it fits together
 
@@ -255,9 +255,11 @@ cp .env.example .env          # put your DATABASE_URL in .env
 docker compose up --build     # page: http://localhost:3000   API: http://localhost:8000
 ```
 
-The database stays on Neon. To use a different env file, run `ENV_FILE=.env.reader docker compose up`. To run the public search-only setup, add `ENABLE_ASK=false`, `SEARCH_MODES=vector` and `DEFAULT_SEARCH_MODE=vector` to that file.
+The database stays on Neon. To use a different env file, run `ENV_FILE=.env.reader docker compose up`. For the public search-only setup, use `.env.public.example` (see "Show it live from your own computer").
 
 Notes on the images:
+
+- Both ports are bound to `127.0.0.1`, so other devices on your network cannot reach them directly.
 
 - The API image uses the CPU build of torch and bakes in both models, so a starting container does not need the internet.
 - Both images run as a non-root user.
@@ -326,6 +328,45 @@ Behind a proxy or ingress, every visitor can look like the same address. Start u
 
 The API only needs to read pages and write the query log. `deploy/sql/readonly_role.sql` creates a login for that. Run it once as the owner with a strong password, then use that login in the API's `DATABASE_URL`. Keep the owner login for `rag.ingest` only.
 
+## Show it live from your own computer
+
+There is no always-on hosted copy. To let someone try it, for example in an interview, you can run it on your computer and share a temporary public link. It uses the search-only setup, so there is no AI key involved and visitors cannot run up a bill.
+
+1. Make your settings file and put the **read-only** database login in it:
+
+   ```bash
+   cp .env.public.example .env.public     # then set DATABASE_URL to the read-only login
+   ```
+
+2. Start the app with those settings:
+
+   ```bash
+   ENV_FILE=.env.public docker compose up --build        # PowerShell: $env:ENV_FILE=".env.public"; docker compose up --build
+   ```
+
+   Open http://localhost:3000 and try a search first. The very first search is slow while the model loads.
+
+3. Open a tunnel to the web page only. A tunnel tool such as Cloudflare's `cloudflared` gives you a random https link that works while the tool is running:
+
+   ```bash
+   cloudflared tunnel --url http://localhost:3000
+   ```
+
+4. Share the link it prints. When you are done, press Ctrl+C in the tunnel window and run `docker compose down`. The link stops working at once.
+
+What keeps this safe:
+
+- Only port 3000 (the web page) is tunneled. The API port is never exposed, and both ports listen on localhost only.
+- Writing answers is switched off, and only the fast vector search is allowed.
+- The database login is read-only, so a visitor cannot change or delete data.
+- Limits cap how many searches run at once and how many are allowed per minute.
+
+Things to know:
+
+- Through a tunnel every visitor looks like the same address to the API, so the per-visitor limit acts as one shared limit. The overall cap still protects you.
+- Anyone with the link can search and can see the `/metrics` page. Do not leave it running unattended.
+- I tested everything up to the tunnel step with this exact settings file. I have not run a tunnel tool with this project, and the tool itself is a separate download.
+
 ## Test questions
 
 `evals/questions.jsonl` has 60 questions, each with the doc page that answers it. `evals/out_of_scope.jsonl` has 10 questions the docs cannot answer, used to check that the app says "not found". Run `python evals/check_questions.py` to confirm every listed page exists.
@@ -340,7 +381,7 @@ I would rather list these here than have you find them.
 - **Re-ranking is slow on a CPU.** About 3 seconds a search in my runs, which is why the public setup uses vector search only.
 - **Rate limits live in memory.** They are counted per API process, so they reset on restart and are not shared if you run more than one copy. The Kubernetes files run one copy of each.
 - **Kubernetes was tried on one local cluster only.** The manifests pass a strict schema check in CI and ran on Docker Desktop's built-in cluster. The `make k8s-up` script, which uses `kind`, has not been run, and nothing has been tried on a cloud cluster.
-- **Not hosted.** There is no live demo link yet. The API image is about 2.5 GB because it carries two models, and it needs roughly 0.5 GB of memory in search-only mode.
+- **Not hosted.** There is no always-on demo link. You can show it live from your own computer (see "Show it live from your own computer"). The API image is about 2.5 GB because it carries two models, and it needs roughly 0.5 GB of memory in search-only mode.
 - **Questions are logged.** The text of each question, its timing and its cost go to the `queries` table so `/metrics` can work. API keys are never stored.
 
 ## Project layout
